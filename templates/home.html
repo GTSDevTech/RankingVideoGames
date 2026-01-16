@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+
+    <nav>
+        <a href="/game/"> Characters </a>
+        {% if user.is_authenticated %}
+            <a href="/logout/"> Logout </a>
+
+        {% else %}
+            <a href="/go_login/"> Login </a>
+
+        {% endif %}
+
+        <a href="/register/"> Register </a>
+    </nav>
+
+    <h1> Home Page</h1>
+
+
+
+{% endblock %}

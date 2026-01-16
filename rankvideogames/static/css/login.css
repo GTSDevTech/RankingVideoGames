@@ -1,0 +1,32 @@
+.main-card{
+    display: flex;
+    height: 75vh;
+    align-content: center;
+    justify-content: center;
+}
+
+.img-fluid{
+    display: flex;
+    height: 74.8vh !important;
+    width: 80vh !important;
+}
+
+.section-login{
+    height: 100vh;
+    width: 100vw;
+    background-image: url("https://img.freepik.com/vector-gratis/fondo-luces-neon-realistas_23-2148916523.jpg?semt=ais_hybrid&w=740&q=80");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+}
+
+.term-condition{
+    display: flex;
+    justify-self: center;
+}
+
+.link{
+    color: #ffffff !important;
+}
