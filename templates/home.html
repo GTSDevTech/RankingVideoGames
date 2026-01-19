@@ -1,23 +1,163 @@
-{% extends 'base.html' %}
 
+{% extends 'base.html' %}
+{% load text_filters %}
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block body_class %}bg-home{% endblock %}
 
 {% block body %}
+<main class="home-content">
+  <div class="container-fluid px-5">
 
-    <nav>
-        <a href="/game/"> Characters </a>
-        {% if user.is_authenticated %}
-            <a href="/logout/"> Logout </a>
+    <div class="games-header mt-4 mb-3">
+      <h2 class="text-center m-0">All Games</h2>
+      
+    </div>
+<section class="games-grid">
+  {% for g in page_obj %}
+  <article class="game-card js-tilt js-game-open">
 
+    <!-- INNER: la pieza que rota -->
+    <div class="game-card__inner">
+
+      <!-- FRONT-->
+      <div class="game-card__front">
+        <div class="game-cover js-tilt-cover">
+          {% if g.cover_url %}
+            <img src="{{ g.cover_url }}" alt="{{ g.name }}">
+          {% else %}
+            <div class="cover-fallback">No cover</div>
+          {% endif %}
+        </div>
+
+        <div class="game-body js-tilt-body">
+          <h3 class="game-title js-tilt-title" title="{{ g.name }}">{{ g.name }}</h3>
+
+          <div class="game-meta js-tilt-meta">
+            {% if g.platforms %}
+              {% for p in g.platforms|split:"|" %}
+                <span class="meta-pill">{{ p }}</span>
+              {% endfor %}
+            {% else %}
+              <span class="meta-pill">Unknown platform</span>
+            {% endif %}
+
+            {% if g.genres %}
+              {% for genre in g.genres|split:"|" %}
+                <span class="meta-pill meta-genre">{{ genre }}</span>
+              {% endfor %}
+            {% else %}
+              <span class="meta-pill meta-genre">Unknown genre</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- BACK: reverso TCG fijo -->
+      <div class="game-card__back" aria-hidden="true"></div>
+
+    </div>
+
+    <!--Datos ocultos (igual) -->
+    <section class="game-hidden" hidden>
+      <span data-field="id">{{ g.id }}</span>
+      <span data-field="slug">{{ g.slug|default:'' }}</span>
+      <span data-field="release">{{ g.first_release_date|default:"" }}</span>
+      <span data-field="developers">{{ g.developers|default:'' }}</span>
+      <span data-field="publishers">{{ g.publishers|default:'' }}</span>
+      <span data-field="rating">{{ g.total_rating|stringformat:"s"|default:"" }}</span>
+      <span data-field="rating_count">{{ g.total_rating_count|stringformat:"s"|default:"" }}</span>
+      <span data-field="cover">{{ g.cover_url|default:'' }}</span>
+      <span data-field="platforms">{{ g.platforms|default:'' }}</span>
+      <span data-field="genres">{{ g.genres|default:'' }}</span>
+      <span data-field="name">{{ g.name|default:'' }}</span>
+    </section>
+
+  </article>
+  {% endfor %}
+</section>
+
+
+    <!-- PAGINATION -->
+    <nav class="pagination-wrap" aria-label="Games pagination">
+      <ul class="pagination pagination-gamer justify-content-center">
+
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link page-link-back" href="?page={{ page_obj.previous_page_number }}">«</a>
+        </li>
         {% else %}
-            <a href="/go_login/"> Login </a>
-
+        <li class="page-item disabled">
+            <span class="page-link page-link-back">«</span>
+        </li>
         {% endif %}
+        {# ventana de páginas: 5 alrededor #}
+        {% for num in page_obj.paginator.page_range %}
+          {% if num >= page_obj.number|add:"-5" and num <= page_obj.number|add:"5" %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
 
-        <a href="/register/"> Register </a>
+       {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link page-link-forward" href="?page={{ page_obj.next_page_number }}">»</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link page-link-forward">»</span>
+        </li>
+        {% endif %}
+        </ul>
+        <p class="text-center games-sub m-0">
+        Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </p>
     </nav>
 
-    <h1> Home Page</h1>
+  </div>
+</main>
 
+<!-- MODAL (añadido, no rompe nada) -->
+<div class="game-modal" id="gameModal" aria-hidden="true">
+  <div class="game-modal__backdrop" data-close></div>
 
+  <div class="game-modal__panel" role="dialog" aria-modal="true" aria-label="Game details">
+    <button class="modal-close" type="button" aria-label="Close" data-close>X</button>
+    <div class="game-modal__content">
+      <div class="game-modal__cover">
+        <img id="modalCover" alt="">
+        <div id="modalCoverFallback" class="cover-fallback" style="display:none;">No cover</div>
+      </div>
 
+      <div class="game-modal__info">
+        <h2 id="modalTitle" class="game-modal__title"></h2>
+
+        <div class="game-modal__facts">
+          <div class="game-modal__fact"><span>ID:</span> <strong id="modalIgdbId"></strong></div>
+          <div class="game-modal__fact"><span>Release:</span> <strong id="modalRelease"></strong></div>
+          <div class="game-modal__fact"><span>Rating:</span> <strong id="modalRating"></strong></div>
+          <div class="game-modal__fact"><span>Votes:</span> <strong id="modalRatingCount"></strong></div>
+          <div class="game-modal__fact"><span>Developers:</span> <strong id="modalDevelopers"></strong></div>
+          <div class="game-modal__fact"><span>Publishers:</span> <strong id="modalPublishers"></strong></div>
+        </div>
+
+        <div class="game-modal__section">
+          <h4>Platforms</h4>
+          <div id="modalPlatforms" class="game-modal__pills "></div>
+        </div>
+
+        <div class="game-modal__section">
+          <h4>Genres</h4>
+          <div id="modalGenres" class="game-modal__pills"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/js/home-card-game.js"></script>
 {% endblock %}

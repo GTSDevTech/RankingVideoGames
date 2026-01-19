@@ -30,7 +30,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         (2, 'Client')
     )
 
-    mail = models.EmailField(max_length=255, null=False, unique=True)
+    email = models.EmailField(max_length=255, null=False, unique=True)
     username = models.CharField(max_length=255, null=False, unique=True)
     role = models.IntegerField(choices=ROLES, null=False)
     is_active = models.BooleanField(default=True)
@@ -48,26 +48,27 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
 
 class VideoGame(models.Model):
-    code = models.IntegerField(null=False)
-    title = models.CharField(max_length=255, null=False)
+    id = models.IntegerField(primary_key=True, null=False)
+    name = models.CharField(max_length=255, null=False)
     slug = models.SlugField(max_length=255, null=False)
-    first_release_date = models.DateField(null=False)
-    platform = models.CharField(max_length=255, null=False)
-    genre = models.CharField(max_length=255, null=False)
-    developer = models.CharField(max_length=255, null=False)
-    publisher = models.CharField(max_length=255, null=False)
-    total_rating = models.IntegerField(null=False)
-    rating_count = models.IntegerField(null=False)
-    cover_code = models.CharField(max_length=255, null=False)
-    cover_url = models.CharField(max_length=255, null=False)
+    first_release_date = models.CharField(max_length=255, null=False)
+    platforms = models.CharField(max_length=255, null=True, blank=True)
+    developers = models.CharField(max_length=255, null=True)
+    publishers = models.CharField(max_length=255, null=True, blank=True)
+    platforms = models.CharField(max_length=255, null=True, blank=True)
+    genres = models.CharField(max_length=255, null=True, blank=True)
+    total_rating = models.DecimalField(decimal_places=2, max_digits=5,default=0)
+    total_rating_count = models.DecimalField(decimal_places=2, max_digits=5, default=0)
+    cover_id = models.IntegerField(null=True, blank=True)
+    cover_url = models.CharField(max_length=255, null=True, blank=True)
     categories = ArrayField(models.IntegerField(),null=True, blank=True, default=list)
 
     class Meta:
-        db_table = 'games'
+        db_table = 'videogame'
         managed = False
 
     def __str__(self):
-        return self.title
+        return self.name
 
 class Category(models.Model):
     code = models.IntegerField(null=False)

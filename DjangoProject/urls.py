@@ -22,5 +22,4 @@ from rankvideogames.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('rankvideogames.urls')),
-    path('Videogames/', include('rankvideogames.urls')),
 ]

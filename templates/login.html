@@ -1,80 +1,267 @@
 {% extends 'base.html' %}
-
-
 {% block body %}
+<style>
+  :root {
+    --login-color: #d204c2;
+    --register-color: #0ebeef;
+    --inactive-bg: rgba(58, 53, 53, 0.06);
+    --inactive-color: #cbd5e1;
+  }
 
+  #authTabs.nav.nav-pills {
+    gap: 0 !important; 
+  }
 
+  #authTabs.nav.nav-pills .nav-item .nav-link {
+    border-radius: 30px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease !important;
+  }
+
+  #authTabs.nav.nav-pills .nav-item:first-child .nav-link {
+    border-radius: 30px 0 0 30px !important;
+  }
+
+  #authTabs.nav.nav-pills .nav-item:last-child .nav-link {
+    border-radius: 0 30px 30px 0 !important;
+  }
+
+  /* LOGIN activo */
+  #authTabs.nav.nav-pills .nav-item #tab-login.active {
+    background: linear-gradient(135deg, var(--login-color), #ff2ed6) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow:
+      0 0 10px rgba(210, 4, 194, 0.9),
+      0 0 20px rgba(255, 46, 214, 0.6) !important;
+    transform: scale(1.05) !important;
+  }
+
+  /* REGISTER activo */
+  #authTabs.nav.nav-pills .nav-item #tab-register.active {
+    background: linear-gradient(135deg, var(--register-color), #2ee2ff) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow:
+      0 0 10px rgba(14, 190, 239, 0.9),
+      0 0 20px rgba(14, 190, 239, 0.6) !important;
+    transform: scale(1.05) !important;
+  }
+
+  /* INACTIVO - Manteniendo tu estilo original */
+  #authTabs.nav.nav-pills .nav-item .nav-link:not(.active) {
+    background-color: var(--inactive-bg) !important;
+    color: var(--inactive-color) !important;
+  }
+
+  /* HOVER LOGIN inactivo */
+  #authTabs.nav.nav-pills .nav-item #tab-login:hover:not(.active) {
+    background-color: rgba(210, 4, 194, 0.2) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(210, 4, 194, 0.5) !important;
+  }
+
+  /* HOVER REGISTER inactivo */
+  #authTabs.nav.nav-pills .nav-item #tab-register:hover:not(.active) {
+    background-color: rgba(14, 190, 239, 0.2) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(14, 190, 239, 0.5) !important;
+  }
+
+  /* QUITAR FOCUS */
+  #authTabs .nav-link:focus,
+  #authTabs .nav-link:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+</style>
 <section class="section-login">
-  <div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col col-xl-10 main-card">
-        <div class="card" style="border-radius: 1rem;">
+  <div class="container">
+    <div class="row d-flex justify-content-center align-items-center h-100 w-100">
+      <div class="main-card">
+        <div class="card login-card">
           <div class="row g-0">
+
             <div class="col-md-6 col-lg-5 d-none d-md-block">
-                  <img src="https://png.pngtree.com/thumb_back/fh260/background/20240716/pngtree-d-cat-as-video-game-live-stream-gamer-use-pc-computer-image_16004832.jpg"
-                   alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
+              <img src="/static/img/areyouplayer.jpg"
+                   alt="auth image"
+                   class="img-fluid"
+                   style="border-radius: 1rem 0 0 1rem;" />
             </div>
+
             <div class="col-md-6 col-lg-7 d-flex align-items-center p-2">
               <div class="card-body p-4 p-lg-5 text-black">
 
-                <form>
-
-                  <div class="d-flex align-items-center mb-3 pb-1">
-                    <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
-                    <span class="h1 fw-bold mb-0">Logo</span>
-                  </div>
-
-                  <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
-
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <input type="email" id="form2Example17" class="form-control form-control-lg" />
-                    <label class="form-label" for="form2Example17">Email address</label>
-                  </div>
-
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <input type="password" id="form2Example27" class="form-control form-control-lg" />
-                    <label class="form-label" for="form2Example27">Password</label>
-                  </div>
-
-                  <div class="pt-1 mb-4">
-                    <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button">Login</button>
-                  </div>
-
-                  <a class="small text-muted" href="#">Forgot password?</a>
-                  <p class="mb-1 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="#"
-                      style="color: #393f81;">Register here</a></p>
-                    <!-- Register buttons -->
-                <div class="text-center">
-                  <p>or sign up:</p>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
-                    <i class="fab fa-facebook-f"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
-                    <i class="fab fa-google"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
-                    <i class="fab fa-twitter"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
-                    <i class="fab fa-github"></i>
-                  </button>
+                <div class="d-flex align-items-center justify-content-center text-center mb-3 pb-1 container-logo">
+                  <img src="/static/img/logo.png"
+                       alt="logo"
+                       class="img-logo"
+                       style="border-radius: 1rem" />
                 </div>
 
-                </form>
+                <ul class="nav nav-pills nav-justified mb-3 custom-tabs" id="authTabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link  {% if mode != 'register' %}active{% endif %}" id="tab-login" data-mdb-pill-init
+                       href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true">Login</a>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <a class="nav-link {% if mode == 'register' %}active{% endif %}" id="tab-register" data-mdb-pill-init
+                       href="#pills-register" role="tab" aria-controls="pills-register" aria-selected="false">Register</a>
+                  </li>
+                </ul>
+
+                <div class="tab-content">
+
+                  <div class="tab-pane fade {% if mode != 'register' %}show active{% endif %}" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
+                    <form class="form-login" method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="mode" value="login">
+
+                      <h5 class="fw-normal mb-3 pb-3 text-center" style="letter-spacing: 1px;">
+                        Sign into your account
+                      </h5>
+
+                      {% if login_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                          {{ login_form.non_field_errors }}
+                        </div>
+                      {% endif %}
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="text"
+                          name="username"
+                          id="form2Example17"
+                          class="form-control form-control-lg"
+                          value="{{ login_form.username.value|default_if_none:'' }}"
+                          required
+                        />
+                        <label class="form-label" for="form2Example17">Username</label>
+                      </div>
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="password"
+                          name="password"
+                          id="form2Example27"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="form2Example27">Password</label>
+                      </div>
+
+                      <div class="pt-1 mb-4">
+                        <button class="btn btn-dark btn-lg w-100" type="submit">
+                          Login
+                        </button>
+                      </div>
+
+                      <a class="small text-muted" href="#">Forgot password?</a>
+
+                      <div class="text-center">
+                        <p>or sign up:</p>
+                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
+                          <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
+                          <i class="fab fa-google"></i>
+                        </button>
+                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
+                          <i class="fab fa-twitter"></i>
+                        </button>
+                        <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-link btn-floating mx-1">
+                          <i class="fab fa-github"></i>
+                        </button>
+                      </div>
+
+                    </form>
+                  </div>
+
+                  <div class="tab-pane fade {% if mode == 'register' %}show active{% endif %}" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
+                    <form class="form-login" method="post">
+                      {% csrf_token %}
+                      <input type="hidden" name="mode" value="register">
+
+                      <h5 class="fw-normal mb-3 pb-3 text-center" style="letter-spacing: 1px;">
+                        Create your account
+                      </h5>
+
+                      {% if register_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                          {{ register_form.non_field_errors }}
+                        </div>
+                      {% endif %}
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="text"
+                          name="username"
+                          id="registerUsername"
+                          class="form-control form-control-lg"
+                          value="{{ register_form.username.value|default_if_none:'' }}"
+                          required
+                        />
+                        <label class="form-label" for="registerUsername">Username</label>
+                      </div>
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="email"
+                          name="email"
+                          id="registerEmail"
+                          class="form-control form-control-lg"
+                          value="{{ register_form.email.value|default_if_none:'' }}"
+                          required
+                        />
+                        <label class="form-label" for="registerEmail">Email</label>
+                      </div>
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="password"
+                          name="password"
+                          id="registerPassword"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="registerPassword">Password</label>
+                      </div>
+
+                      <div data-mdb-input-init class="form-outline mb-4">
+                        <input
+                          type="password"
+                          name="repeat_password"
+                          id="registerRepeatPassword"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="registerRepeatPassword">Repeat password</label>
+                      </div>
+
+                      <div class="pt-1 mb-4">
+                        <button class="btn btn-dark btn-lg w-100" type="submit">
+                          Register
+                        </button>
+                      </div>
+
+                    </form>
+                  </div>
+
+                </div>
+
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
-    </div>
-        <div class="term-condition">
-            <a href="#" class="link small justify-content-center">Terms of use & Privacy policy</a>
-        </div>
 
+      <div class="term-condition">
+        <a href="#" class="link small justify-content-center">Terms of use & Privacy policy</a>
+      </div>
+
+    </div>
   </div>
 </section>
 

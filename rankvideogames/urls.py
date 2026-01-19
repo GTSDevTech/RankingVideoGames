@@ -1,8 +1,12 @@
 from django.urls import path, include
-from rankvideogames.views import go_home, show_games, go_login
+from rankvideogames.views import *
 
 urlpatterns = [
-    path('', go_login, name='go_login'),
-    path('games/', show_games, name='go_game'),
-    path('login', go_login, name='go_login'),
+    path('', auth_view, name='go_login'),
+    path('login/', auth_view, name='go_login'),
+    path('logout/', logout_user, name='logout_user'),
+    path('home/', go_home, name='go_home'),
+    path('ranking/', go_ranking, name='go_ranking'),
+    path('review/', go_review, name='go_review'),
+
 ]

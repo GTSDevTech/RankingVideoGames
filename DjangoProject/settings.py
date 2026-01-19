@@ -82,12 +82,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    "mongo": {
+    "mongodb": {
         "ENGINE": "django_mongodb_backend",
         "HOST": "mongodb://localhost:27017/",
-        "NAME": "Project_DA",
+        "NAME": "games_db",
     }
 }
+
+DATABASE_ROUTERS = ['DjangoProject.db_routers.MongoRouter']
 
 
 # Password validation

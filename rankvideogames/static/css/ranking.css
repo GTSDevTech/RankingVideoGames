@@ -1,0 +1,192 @@
+
+body.bg-rankings{
+   background-image: url('/static/img/wallpaper2.jpg');
+  background-repeat: no-repeat !important;
+  background-size:cover;
+  background-attachment:fixed;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.home-content{
+  margin-top: 180px !important;
+  min-height: 100% !important;
+}
+
+.ranking-section{
+    top: 160px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.ranking-section h2{
+  background: linear-gradient(135deg, #d204c2, #ff2ed6) !important;
+  padding: 0.5rem;
+  border-radius: 30px;
+  color: rgb(0, 0, 0, 1) !important;
+  opacity: 0.6;
+}
+
+
+/* Carousel heading */
+.heading {
+  display: block;
+  text-align: center;
+}
+
+/* Container for the entire carousel */
+.multi-carousel-container {
+  cursor: grab;
+  margin: 0 auto;
+  width: 92% !important;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Cursor styles for dragging */
+.multi-carousel-container.dragging,
+#multiCarousel.dragging {
+  cursor: grabbing;
+}
+
+/* Wrapper for all slides */
+.multi-carousel-inner {
+  display: flex;
+  width: 100% !important;
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Individual slide */
+.multi-carousel-item,
+.clone {
+  box-sizing: border-box;
+  flex:  0 0 calc(100% / 5);
+  padding: 0 5px;
+  width: fit-content;
+  position: relative; /* Essential for item-number positioning */
+}
+
+/* Control buttons */
+.multi-carousel-control-prev,
+.multi-carousel-control-next {
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  position: absolute;
+  text-decoration: none;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: background-color 0.3s ease;
+  width: 40px;
+  z-index: 10;
+}
+
+.multi-carousel-control-prev:hover,
+.multi-carousel-control-next:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.multi-carousel-control-prev {
+  left: 10px;
+}
+
+.multi-carousel-control-next {
+  right: 10px;
+}
+
+/* Image container with dynamic height */
+.img-container {
+    justify-self: center;
+    align-self: center;
+    border-radius: 1.5rem;
+    height: var(--carousel-height, 30vh);
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Image styling */
+.img-container img,
+#carouselInner img {
+  height: 30vh;
+  object-fit:fill;
+  object-position: center;
+  pointer-events: none;
+  width: 100%;
+  gap: 1rem;
+  -webkit-user-drag: none;
+  transition: transform 0.3s ease;
+}
+
+.img-container:hover img {
+  transform: translateZ(0) scale(1.02);
+}
+
+/* Item number styling - guaranteed visibility */
+.item-number {
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  display: inline-flex;
+  font-size: 120%;
+  font-weight: bold;
+  height: 35px;
+  justify-content: center;
+  left: 1rem;
+  position: absolute;
+  top: 1rem;
+  width: 35px;
+  z-index: 2; /* Higher than default but below controls */
+  /* Isolation prevents z-index context issues */
+  isolation: isolate;
+}
+
+/* Carousel cursor styling */
+#multiCarousel {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+/* Disable text selection during drag */
+#multiCarousel.dragging {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+
+
+
+@media (max-width: 45em) {
+  .multi-carousel-item,
+  .clone {
+    flex: 0 0 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    justify-content: space-around !important;
+  }
+}
+
+
+
+

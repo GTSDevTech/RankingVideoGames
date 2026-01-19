@@ -1,0 +1,167 @@
+<nav class="navbar navbar-expand-lg gaming-navbar">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-mdb-collapse-init data-mdb-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <a class="navbar-brand gaming-brand d-flex align-items-center" href="{% url 'go_home' %}">
+      <img src="/static/img/logo.png" alt="GameRank" class="navbar-logo" />
+      <span class="ms-2">Gamers Rankings</span>
+    </a>
+
+    <div class="collapse navbar-collapse links" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gaming-menu">
+       <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'go_home' %}active{% endif %}"
+            href="{% url 'go_home' %}">Home</a>
+      </li>
+
+      <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'go_review' %}active{% endif %}"
+            href="{% url 'go_review' %}">Reviews</a>
+      </li>
+
+      <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'go_ranking' %}active{% endif %}"
+          href="{% url 'go_ranking' %}">Rankings</a>
+      </li>
+      </ul>
+    </div>
+
+    <div class="d-flex align-items-center">
+      <div class="dropdown me-3">
+        <a data-mdb-dropdown-init class="text-reset dropdown-toggle hidden-arrow notification-icon"
+           href="#" role="button" aria-expanded="false">
+          <i class="fas fa-bell"></i>
+          <span class="badge badge-notification">1</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#">New ranking available</a></li>
+          <li><a class="dropdown-item" href="#">New review added</a></li>
+        </ul>
+      </div>
+
+      <div class="dropdown">
+        <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" data-mdb-dropdown-init>
+          <img src="/static/img/icon-home.png" class="rounded-circle profile-avatar" alt="profile" />
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#">Preferences</a></li>
+          <li><a class="dropdown-item text-danger" href="{% url 'logout_user' %}">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<section class="home-toolbar">
+  <div class="container-fluid container-toolbar">
+    <div class="toolbar-top">
+
+      <!-- Search -->
+      <form class="toolbar-search" method="get" action="">
+        <div class="input-group search-group">
+
+          <button
+            class="btn btn-gamer-filter"
+            type="button"
+            data-mdb-collapse-init
+            data-mdb-target="#filtersCollapse"
+            aria-expanded="false"
+            aria-controls="filtersCollapse">
+            <i class="fa-solid fa-filter me-2"></i> Filters
+          </button>
+
+
+          <input type="hidden" name="search_by" id="search_by" value="{{ request.GET.search_by|default:'all' }}">
+
+          <input
+            type="text"
+            class="form-control search-input"
+            name="q"
+            value="{{ request.GET.q|default:'' }}"
+            placeholder="Search games...">
+
+          <button class="btn btn-search-submit" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+
+        </div>
+      </form>
+
+      <!-- Sort -->
+      <form class="toolbar-sort" method="get" action="">
+        <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+        <input type="hidden" name="search_by" value="{{ request.GET.search_by|default:'all' }}">
+
+        <select class="form-select sort-select" name="sort" onchange="this.form.submit()">
+          <option value="popular" {% if request.GET.sort == "popular" or not request.GET.sort %}selected{% endif %}>Popular</option>
+          <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Recents</option>
+          <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>Most Relevant</option>
+        </select>
+      </form>
+
+    </div>
+
+    <!-- COLLAPSE FILTERS -->
+    <div class="collapse mt-3" id="filtersCollapse">
+      <div class="filters-card">
+        <form class="row g-3" method="get" action="">
+          <input type="hidden" name="q" value="{{ request.GET.q|default:'' }}">
+          <input type="hidden" name="search_by" value="{{ request.GET.search_by|default:'all' }}">
+          <input type="hidden" name="sort" value="{{ request.GET.sort|default:'popular' }}">
+
+          <div class="col-12 col-md-3">
+            <label class="form-label filter-label">Category</label>
+            <select class="form-select filter-select" name="category">
+              <option value="">All</option>
+              <option value="1">Action</option>
+              <option value="2">RPG</option>
+              <option value="3">Shooter</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label class="form-label filter-label">Timeframe</label>
+            <select class="form-select filter-select" name="time">
+              <option value="">Any</option>
+              <option value="week">Last week</option>
+              <option value="month">Last month</option>
+              <option value="year">Last year</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label class="form-label filter-label">Platform</label>
+            <select class="form-select filter-select" name="platform">
+              <option value="">All</option>
+              <option value="PC (Microsoft Windows)">PC</option>
+              <option value="PlayStation">PlayStation</option>
+              <option value="Xbox">Xbox</option>
+              <option value="Nintendo">Nintendo</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-3">
+            <label class="form-label filter-label">Status</label>
+            <select class="form-select filter-select" name="status">
+              <option value="">Any</option>
+              <option value="released">Released</option>
+              <option value="early">Early Access</option>
+              <option value="coming">Coming Soon</option>
+            </select>
+          </div>
+
+          <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <a class="btn btn-reset" href="{% url 'go_home' %}">Reset</a>
+            <button class="btn btn-gamer-apply" type="submit">Apply</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>

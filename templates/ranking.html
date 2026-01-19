@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block body_class %}bg-rankings{% endblock %}
+
+{% block body %}
+
+<main class="home-content">
+
+  <div class="container-fluid">
+
+    <!-- CAROUSEL 1 -->
+    <section class="ranking-section">
+      <div class="heading mt-4 mb-2">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
+        <div class="multi-carousel-inner">
+            {% for m in pop %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+          </div>
+        </div>
+            {% endfor %}
+        </div>
+
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CAROUSEL 2 -->
+        <section class="ranking-section">
+      <div class="heading mt-4 mb-2">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
+        <div class="multi-carousel-inner">
+            {% for m in rated %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+          </div>
+        </div>
+            {% endfor %}
+        </div>
+
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CAROUSEL 3 -->
+       <section class="ranking-section">
+      <div class="heading mt-4 mb-2">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
+        <div class="multi-carousel-inner">
+            {% for m in new_releases %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+          </div>
+        </div>
+            {% endfor %}
+        </div>
+
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="/static/js/carousel.js"></script>
+
+{% endblock %}
