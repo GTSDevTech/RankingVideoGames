@@ -1,3 +1,6 @@
+import csv
+from hmac import new
+
 from django.shortcuts import render, redirect
 from rankvideogames.forms import *
 from django.core.paginator import Paginator
@@ -21,6 +24,10 @@ def go_home(request):
     return render(request, "home.html", {
         "page_obj": page_obj,
     })
+
+def go_admin(request):
+
+    return render(request, "admin.html")
 
 
 def go_review(request):
@@ -59,7 +66,7 @@ def auth_view(request):
                 username = login_form.cleaned_data.get("username")
                 password = login_form.cleaned_data.get("password")
                 user = authenticate(request, username=username, password=password)
-                if user is not None:
+                if user is not None and user:
                     login(request, user)
                     return redirect("go_home")
 
@@ -79,3 +86,33 @@ def auth_view(request):
 def logout_user(request):
     logout(request)
     return redirect("go_login")
+
+
+def load_data_movies(request):
+    if request.method == "POST":
+        update_file = request.FILES.get("update_file")
+        # if not update_file:
+            # return redirect(request, admin.html)
+
+        decode_file = update_file.read().decode("utf-8").splitlines()
+        reader = csv.DictReader(decode_file)
+
+        for row in reader:
+            videogame = VideoGame()
+            videogame.id = row['id']
+            videogame.name = row['name']
+            videogame.slug = row['slug']
+            videogame.first_release_date = row['first_release_date']
+            videogame.platforms = row['platforms']
+            videogame.genres = row['genres']
+            videogame.developers = row['developers']
+            videogame.publishers = row['publishers']
+            videogame.total_rating = row['total_rating']
+            videogame.total_rating_count = row['total_rating_count']
+            videogame.cover_id = row['cover_id']
+            videogame.cover_url = row['cover_url']
+
+            videogame.save()
+
+
+

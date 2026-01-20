@@ -84,8 +84,8 @@ DATABASES = {
     },
     "mongodb": {
         "ENGINE": "django_mongodb_backend",
-        "HOST": "mongodb://localhost:27017/",
-        "NAME": "games_db",
+        "HOST": "mongodb+srv://gtejadosanchezDB:Tuttosport-99@gts-cluster.6lgbyv7.mongodb.net/",
+        "NAME": "ascention_rank",
     }
 }
 

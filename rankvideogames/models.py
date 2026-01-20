@@ -64,7 +64,7 @@ class VideoGame(models.Model):
     categories = ArrayField(models.IntegerField(),null=True, blank=True, default=list)
 
     class Meta:
-        db_table = 'videogame'
+        db_table = 'videogames'
         managed = False
 
     def __str__(self):
