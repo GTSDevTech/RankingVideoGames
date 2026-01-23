@@ -12,7 +12,7 @@ class UsuarioManager(BaseUserManager):
         if not email or not username or not role:
             raise ValueError('Users must have an email address and username')
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, role=role)
+        user = self.model(email=email, username=username, role='Client')
         user.set_password(password)
         user.save(using=self._db)
         return user

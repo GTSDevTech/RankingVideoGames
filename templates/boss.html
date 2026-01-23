@@ -5,21 +5,21 @@
   {% include 'includes/nav.html' %}
 {% endblock %}
 
-{% block body_class %}bg-admin{% endblock %}
+{% block body_class %}bg-boss{% endblock %}
 
 {% block body %}
-
-
+<main class="home-content">
 <div class="col-3 col-md-3">
-    <a href="{% url 'go_data_load' %}" class="text-decoration-none text-white">
+    <a href="{% url 'go_boss' %}" class="text-decoration-none text-white">
         <div class="card text-center text-white bg-yellow card-hover ">
             <div class="card-body py-5">
-                <img src="{% static 'images/data_load.png' %}" alt="Admin" width="64" height="64"
+                <img src="/static/img/add_file.png" alt="Admin" width="64" height="64"
                      class="icon-white mb-3">
                 <h3 class="card-title">Data Load</h3>
             </div>
         </div>
     </a>
 </div>
+</main>
 
 {% endblock %}

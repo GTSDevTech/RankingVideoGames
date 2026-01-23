@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (w < 720) itemsPerSlide = 1;
       else if (w < 992) itemsPerSlide = 3;
+      else if (w < 1800) itemsPerSlide = 4;
       else itemsPerSlide = parseInt(carousel.dataset.items || "5", 10);
 
       slideBy = 1;

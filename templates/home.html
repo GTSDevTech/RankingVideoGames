@@ -1,5 +1,7 @@
 
 {% extends 'base.html' %}
+
+
 {% load text_filters %}
 {% block nav %}
   {% include 'includes/nav.html' %}
@@ -9,13 +11,13 @@
 
 {% block body %}
 <main class="home-content">
-  <div class="container-fluid px-5">
+  <div class="container-fluid min-vh-100 px-5 align-items-flex-start d-flex-column justify-content-center">
 
-    <div class="games-header mt-4 mb-3">
+    <div class="games-header pt-5 mb-5">
       <h2 class="text-center m-0">All Games</h2>
       
     </div>
-<section class="games-grid">
+  <section class="games-grid">
   {% for g in page_obj %}
   <article class="game-card js-tilt js-game-open">
 
@@ -95,7 +97,7 @@
         {% endif %}
         {# ventana de páginas: 5 alrededor #}
         {% for num in page_obj.paginator.page_range %}
-          {% if num >= page_obj.number|add:"-5" and num <= page_obj.number|add:"5" %}
+          {% if num >= page_obj.number|add:"-3" and num <= page_obj.number|add:"3" %}
             {% if page_obj.number == num %}
               <li class="page-item active"><span class="page-link">{{ num }}</span></li>
             {% else %}

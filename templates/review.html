@@ -1,111 +1,95 @@
 {% extends 'base.html' %}
+
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
-{% block body_class %}bg-reviews{% endblock %}
+
+{% block body_class %}bg-review{% endblock %}
 
 {% block body %}
-<main class="home-content ranking-page">
-  <div class="container-fluid px-3 px-lg-4 py-3">
 
-    <div class="row g-3 align-items-start">
+<main class="home-content">
 
-      <!-- LEFT: creator + selected preview -->
-      <aside class="col-12 col-lg-3">
-        <div class="rk-panel rk-panel--blue mb-3">
-          <div class="rk-panel__head">
-            <div>
-              <div class="rk-title">Creador de ranking</div>
-              <div class="rk-subtitle">Elige categoría y arma tu Top 5</div>
-            </div>
-          </div>
+  <div class="container-fluid min-vh-100 p-5 align-items-flex-start d-flex-column justify-content-center">
 
-          <div class="rk-panel__body">
-            <label class="rk-label">Categoría</label>
-            <select id="categorySelect" class="form-select rk-select">
-              <option value="platforms_1980s">Plataformas (1980s)</option>
-              <option value="platforms_1990s">Plataformas (1990s)</option>
-              <option value="platforms_2000s">Plataformas (2000s)</option>
-              <option value="platforms_2010s">Plataformas (2010s)</option>
-              <option value="platforms_2020s">Plataformas (2020s)</option>
-            </select>
+    <!-- CAROUSEL 1 -->
+    <section class="review-section">
+      <div class="heading mt-5 mb-5 ">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
 
-            <button id="resetBtn" class="btn rk-btn-reset w-100 mt-3">
-              <i class="bx bx-refresh"></i> Reset ranking
-            </button>
-
-            <div class="rk-stats mt-3">
-              <span>Seleccionados</span>
-              <span><strong id="filledCount">0</strong>/5</span>
-            </div>
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
+        <div class="multi-carousel-inner">
+            {% for m in pop %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
           </div>
         </div>
-
-        <div class="rk-panel rk-panel--purple">
-          <div class="rk-panel__head">
-            <div>
-              <div class="rk-title">Top seleccionado</div>
-              <div class="rk-subtitle">Vista rápida de lo que llevas</div>
-            </div>
-          </div>
-          <div class="rk-panel__body">
-            <div id="selectedList" class="rk-selected"></div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- CENTER: big Top5 card with slots -->
-      <section class="col-12 col-lg-6">
-        <div class="rk-hero">
-          <div class="rk-hero__head">
-            <div>
-              <div class="rk-hero__title">TOP 5 RANKING</div>
-              <div class="rk-hero__subtitle">Arrastra desde la derecha · Reordena soltando en otra posición</div>
-            </div>
-            <div class="rk-badge">Drag & Drop</div>
-          </div>
-
-          <div class="rk-hero__body">
-            <div id="top5List" class="rk-top5"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT: search + pool -->
-      <aside class="col-12 col-lg-3">
-        <div class="rk-panel rk-panel--cyan mb-3">
-          <div class="rk-panel__head">
-            <div>
-              <div class="rk-title">Listado</div>
-              <div class="rk-subtitle">Busca y arrastra al Top 5</div>
-            </div>
-            <div class="rk-mini">
-              <span>Items</span>
-              <strong id="poolCount">0</strong>
-            </div>
-          </div>
-
-          <div class="rk-panel__body">
-            <div class="rk-search">
-              <i class="bx bx-search"></i>
-              <input id="searchInput" class="rk-search__input" type="text" placeholder="Buscar…">
-              <button id="clearSearchBtn" class="rk-search__clear" type="button">Limpiar</button>
-            </div>
-          </div>
+            {% endfor %}
         </div>
 
-        <div class="rk-pool-wrap">
-          <div id="poolGrid" class="rk-pool"></div>
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CAROUSEL 2 -->
+        <section class="review-section">
+      <div class="heading mt-5 mb-5 ">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="7000">
+        <div class="multi-carousel-inner">
+            {% for m in rated %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+          </div>
+        </div>
+            {% endfor %}
         </div>
 
-        <small class="text-white-50 d-block mt-2">
-          Tip: arrastra desde el Top 5 hacia el listado para quitar.
-        </small>
-      </aside>
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
 
-    </div>
+    <!-- CAROUSEL 3 -->
+       <section class="review-section">
+      <div class="heading mt-5 mb-5 ">
+        <h2 class="text-center">Top Popular</h2>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="3" data-interval="9000">
+        <div class="multi-carousel-inner">
+            {% for m in new_releases %}
+          <div class="multi-carousel-item">
+            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+          </div>
+        </div>
+            {% endfor %}
+        </div>
+
+        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="multi-carousel-control-next" type="button" data-action="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
   </div>
 </main>
 
-<script src="/static/js/ranking.js"></script>
-{% endblock body %}
+<script src="/static/js/carousel.js"></script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load text_filters %}
+
+
+
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block body_class %}bg-user{% endblock %}
+
+{% block body %}
+<style>
+.user-card__bg{
+  position: absolute !important;
+  inset: 0;
+  z-index: 0 !important;
+  background: url('/static/img/switch_games.png') center / cover no-repeat !important;
+  opacity: .35;
+  filter: saturate(1.15) contrast(1.05);
+  pointer-events: none;
+}
+
+.user-card::after{
+  content:"";
+  position: absolute;
+  inset: 0;
+  z-index: 1; 
+  background: linear-gradient(180deg,
+    rgba(15,12,41,.50) 0%,
+    rgba(15,12,41,.65) 55%,
+    rgba(2,54,129,.35) 100%);
+}
+
+/* contenido encima de todo */
+.user-card__top,
+.user-card__meta,
+.user-card__footer{
+  position: relative;
+  z-index: 2;
+}
+
+</style>
+<main class="user-content">
+  <div class="container-fluid px-5 user-panel-wrap">
+    <section class="user-panel">
+
+      <div class="user-toolbar">
+        <div class="user-toolbar__left">
+          <span class="user-dot"></span>
+          <h2 class="user-title">Users Status</h2>
+        </div>
+
+        <div class="user-toolbar__center">
+          <label class="user-search" aria-label="Buscar usuario">
+            <span class="user-search__icon">⌕</span>
+            <input id="searchInput" type="search" class="user-search__input"
+                   placeholder="Buscar por username o email..." />
+          </label>
+        </div>
+
+        <div class="user-toolbar__right">
+          <div class="user-seg" role="tablist" aria-label="Filtro por género">
+            <button class="user-seg__btn is-active" data-gender="all" type="button">All</button>
+            <button class="user-seg__btn" data-gender="M" type="button">Men</button>
+            <button class="user-seg__btn" data-gender="F" type="button">Women</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="results" class="user-grid">
+        {% for u in page_user %}
+        <article
+          class="user-card"
+          data-username="{{ u.username|default_if_none:'' }}"
+          data-email="{{ u.email|default_if_none:'' }}"
+          data-gender="{{ u.gender|default_if_none:'all' }}"
+        >
+          <div class="user-card__bg"></div>
+
+          <div class="user-card__top">
+            <div class="user-avatar">
+              <img src="{{ u.avatar_url|default:'/static/img/user_default.png' }}" alt="{{ u.username }}">
+              <span class="user-ring"></span>
+            </div>
+          </div>
+
+          <div class="user-card__meta">
+            <div class="user-name">{{ u.username }}</div>
+            <div class="user-email">{{ u.email }}</div>
+          </div>
+
+          <div class="user-card__footer">
+            <span class="user-pill user-pill--rank">🏆 Rankings: {{ u.rankings_count|default:0 }}</span>
+            <span class="user-pill user-pill--rate">⭐ Ratings: {{ u.ratings_count|default:0 }}</span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+    </section>
+  </div>
+
+
+</main>
+  <script src="/static/js/user-table.js"></script>
+{% endblock %}

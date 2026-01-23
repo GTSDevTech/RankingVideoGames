@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load text_filters %}
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block title %}Boss Panel{% endblock %}
+
+
+{% block body_class %}bg-boss{% endblock %}
+
+
+{% block body %}
+<main class="boss-content">
+    <div class="container px-5 min-vh-100 min-vw-100 d-flex align-items-center justify-content-center">
+
+ <section class="boss-wrapper">
+
+      <div class="boss-cards">
+
+        <!-- CARD 1: DATA LOAD (EXPANDE) -->
+        <article class="boss-card is-collapsed" id="bossCardData">
+          <div class="boss-card__inner js-expander" role="button" tabindex="0" aria-expanded="false">
+            <img src="{% static 'img/add_file.png' %}" alt="" class="boss-card__icon">
+            <h3 class="boss-card__title">Data Load</h3>
+            <p class="boss-card__sub">Load or update DB</p>
+          </div>
+
+          <div class="boss-card__expander" aria-hidden="true">
+            <button type="button" class="boss-card__close js-collapser" aria-label="Cerrar">×</button>
+
+            <div class="boss-card__expanderBody">
+              <p class="boss-card__desc">
+                Upload datasets / CSV / JSON to load or update DB.
+              </p>
+           <form id="dataLoadForm"
+                action="{% url 'load_data_movies' %}"
+                method="post"
+                enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input id="updateFileInput"
+                    type="file"
+                    name="update_file"
+                    accept=".csv"
+                    class="file-hidden"
+                    required>
+
+                <div class="boss-file-row">
+                    <label for="updateFileInput" class="boss-btn boss-btn--primary" id="btnPickFile">
+                    Import CSV
+                    </label>
+
+                    <span class="boss-file-path" id="fileNamePreview">
+                    Not File selected
+                    </span>
+
+                    <button type="submit"
+                            class="boss-btn boss-btn--secondary boss-file-submit"
+                            id="btnSubmitCsv"
+                            action="{% url 'load_data_movies' %}"
+                            disabled>
+                    Accept File
+                    </button>
+                </div>
+            </form>
+
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 2: COLLECTIONS (ABRE MODAL) -->
+        <article class="boss-card is-collapsed" id="bossCardCollections">
+          <div class="boss-card__inner js-open-collections" role="button" tabindex="0">
+            <img src="{% static 'img/add_categories.png' %}" alt="" class="boss-card__icon">
+            <h3 class="boss-card__title">Add Categories</h3>
+            <p class="boss-card__sub">Create and Admin Collections</p>
+          </div>
+
+          <!-- (Opcional) también con expander si quieres info extra -->
+          <div class="boss-card__expander" aria-hidden="true">
+            <button type="button" class="boss-card__close js-collapser" aria-label="Cerrar">×</button>
+
+            <div class="boss-card__expanderBody">
+              <p class="boss-card__desc">
+                Create custom Categories (Top RPG, Indies, Soulslike…) by Ranking Games.
+              </p>
+
+            <button type="button" class="boss-btn boss-btn--secondary js-open-collections">
+                Open Collections Form
+            </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+    </div>
+</main>
+
+<!-- MODAL Categories -->
+<div class="boss-modal" id="collectionsModal" aria-hidden="true">
+  <div class="boss-modal__backdrop" data-close></div>
+
+  <div class="boss-modal__panel" role="dialog" aria-modal="true" aria-label="Crear categoría">
+    <button class="boss-modal__close" type="button" data-close aria-label="Cerrar">×</button>
+
+    <h3 class="boss-modal__title">Create Category</h3>
+    <p class="boss-modal__sub">Add a new category for rankings.</p>
+
+    <form class="boss-form" method="post" action="{% url 'create_news_categories' %}">
+      {% csrf_token %}
+
+      <label class="boss-label">
+        Code
+        <input class="boss-input" type="number" name="code" min="1" required placeholder="101" />
+      </label>
+
+      <label class="boss-label">
+        Name
+        <input class="boss-input" type="text" name="name" maxlength="255" required placeholder="Top JRPG" />
+      </label>
+
+      <label class="boss-label">
+        Description
+        <textarea class="boss-textarea" name="description" rows="4" maxlength="255" required
+          placeholder="JRPG with epic history and fighting to turns..."></textarea>
+      </label>
+
+      <div class="boss-form__actions">
+        <button type="button" class="boss-btn boss-btn--ghost" data-close>Cancel</button>
+        <button type="submit" class="boss-btn boss-btn--primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'js/data-cards.js' %}"></script>
+
+{% endblock %}

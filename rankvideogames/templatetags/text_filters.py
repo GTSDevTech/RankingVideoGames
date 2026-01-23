@@ -1,5 +1,4 @@
 from django import template
-print("✅ CARGADO text_filters")
 register = template.Library()
 
 @register.filter

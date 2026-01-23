@@ -1,0 +1,289 @@
+:root{
+  --login-color: #d204c2;
+  --login-color-2: #ff2ed6;
+  --register-color: #0ebeef;
+  --register-color-2: #2ee2ff;
+  --nav-active: #a855f7;
+  --inactive-bg: rgba(15, 12, 41, 0.75);
+  --inactive-border: rgba(168, 85, 247, 0.25);
+  --inactive-text: #e5e7eb;
+}
+
+html, body{
+  width: 100%;
+  height: 100%;
+}
+
+body.bg-user{
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  background-image: url('/static/img/switch_games.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* Igual que HOME: baja el contenido con top:160 */
+.user-content{
+  position: relative;
+  top: 160px !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 160px);
+  justify-content: flex-start;   /* arriba */
+  align-items: center;           /* centrado horizontal */
+}
+
+/* wrapper: NO center vertical */
+.user-panel-wrap{
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-bottom: 24px;
+}
+
+/* panel */
+.user-panel{
+  width: min(1100px, 92%);
+  background: rgba(15, 12, 41, 0.55);
+  border: 1px solid rgba(168, 85, 247, 0.20);
+  border-radius: 18px;
+  box-shadow: 0 0 22px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+}
+
+/* toolbar */
+.user-toolbar{
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 520px) 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(15, 12, 41, 0.70);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+}
+
+@media (max-width: 920px){
+  .user-toolbar{
+    grid-template-columns: 1fr;
+  }
+  .user-toolbar__left,
+  .user-toolbar__center,
+  .user-toolbar__right{
+    justify-content: center;
+    display: flex;
+  }
+}
+
+.user-toolbar__left{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--register-color), var(--register-color-2));
+  box-shadow: 0 0 12px rgba(46,226,255,.45);
+}
+
+.user-title{
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: .08em;
+  font-weight: 900;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* search */
+.user-search{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(15,12,41,.65);
+  border: 1px solid rgba(168,85,247,.25);
+}
+
+.user-search__icon{
+  color: rgba(229,231,235,.8);
+  font-weight: 900;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.user-search__input{
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #fff;
+  font-weight: 600;
+}
+
+.user-search__input::placeholder{ color: rgba(229,231,235,.55); }
+
+/* segmented */
+.user-toolbar__right{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.user-seg{
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(2, 54, 129, 0.35);
+  border: 1px solid rgba(56,189,248,.22);
+}
+
+.user-seg__btn{
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(229,231,235,.85);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  letter-spacing: .04em;
+  font-size: .85rem;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+
+.user-seg__btn:hover{ transform: translateY(-1px); }
+
+.user-seg__btn.is-active{
+  background: linear-gradient(135deg, var(--login-color), var(--login-color-2));
+  color: #0b1020;
+  box-shadow: 0 0 16px rgba(255,46,214,.22);
+}
+
+/* grid users */
+.user-grid{
+  margin-top: 14px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px){
+  .user-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px){
+  .user-grid{ grid-template-columns: 1fr; }
+}
+/* card */
+.user-card{
+  position: relative;
+  /* isolation: isolate;  <-- QUITAR */
+  border-radius: 18px;
+  border: 1px solid rgba(168,85,247,.22);
+  overflow: hidden;
+  background: rgba(0,0,0,.22);
+  padding: 14px;
+  min-height: 210px;
+  box-shadow: 0 0 18px rgba(0,0,0,.35);
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.user-card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(46,226,255,.35);
+  box-shadow: 0 0 18px rgba(46,226,255,.14), 0 0 18px rgba(168,85,247,.10);
+}
+
+/* fondo imagen */
+.user-card__bg{
+  position: absolute;
+  inset: 0;
+  z-index: 0; 
+  background: url('/static/img/switch_games.png') center / cover no-repeat !important;
+  opacity: .35;
+  filter: saturate(1.15) contrast(1.05);
+  pointer-events: none;
+}
+
+/* overlay encima */
+
+.user-avatar{
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.user-avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.user-ring{
+  position: absolute;
+  inset: -2px;
+  border-radius: 999px;
+  border: 3px solid rgba(46,226,255,.95);
+  box-shadow: 0 0 16px rgba(46,226,255,.18);
+  pointer-events: none;
+}
+
+/* meta */
+.user-card__meta{ margin-top: 12px; }
+
+.user-name{
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  letter-spacing: .05em;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.user-email{
+  margin-top: 6px;
+  color: rgba(229,231,235,.78);
+  font-weight: 600;
+  font-size: .92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* pills */
+.user-card__footer{
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.user-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: .78rem;
+  background: rgba(2,54,129,.55);
+  border: 1px solid rgba(56,189,248,.22);
+  color: rgba(229,231,235,.92);
+  font-family: 'Orbitron', sans-serif;
+}

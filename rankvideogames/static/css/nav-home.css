@@ -161,7 +161,7 @@
 
 .links{
     justify-content: space-around !important;
-    align-items: center;
+    align-items: center !important;
 }
 
 .gaming-menu .nav-link {

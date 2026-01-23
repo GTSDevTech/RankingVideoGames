@@ -260,17 +260,19 @@ function itemHTML(item, { used, draggable, source, topIndex }) {
   const usedClass = used ? " rk-used" : "";
 
   // Si en el futuro quieres imagen real:
-  // const cover = item.coverUrl ? `<img src="${escapeHtml(item.coverUrl)}" alt="">` : escapeHtml(item.coverText || "GAME");
-  const cover = escapeHtml(item.coverText || "GAME");
+  const cover = item.coverUrl ? `<img src="${escapeHtml(item.coverUrl)}" alt="">` : escapeHtml(item.coverText || "GAME");
+  //const cover = escapeHtml(item.coverText || "GAME");
 
   return `
+  {%for g in pag_object.games %}
     <div class="rk-item${usedClass}" draggable="${draggable ? "true" : "false"}" ${attrs.join(" ")}>
-      <div class="rk-cover">${cover}</div>
+      <div class="rk-cover">${escapeHtml(g.cover_url)}</div>
       <div class="rk-info">
-        <p class="rk-name">${escapeHtml(item.name)}</p>
-        <p class="rk-meta">${escapeHtml(item.id)}</p>
+        <p class="rk-name">${escapeHtml(g.name)}</p>
+        <p class="rk-meta">${escapeHtml(g.platforms)}</p>
       </div>
     </div>
+  {%endfor %}
   `;
 }
 
