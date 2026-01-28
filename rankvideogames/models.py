@@ -55,7 +55,6 @@ class VideoGame(models.Model):
     platforms = models.CharField(max_length=255, null=True, blank=True)
     developers = models.CharField(max_length=255, null=True)
     publishers = models.CharField(max_length=255, null=True, blank=True)
-    platforms = models.CharField(max_length=255, null=True, blank=True)
     genres = models.CharField(max_length=255, null=True, blank=True)
     total_rating = models.DecimalField(decimal_places=2, max_digits=5,default=0)
     total_rating_count = models.DecimalField(decimal_places=2, max_digits=5, default=0)
@@ -71,13 +70,25 @@ class VideoGame(models.Model):
         return self.name
 
 class Category(models.Model):
-    code = models.IntegerField(null=False)
+    code = models.IntegerField(unique=True)
     name = models.CharField(max_length=255, null=False)
     description = models.CharField(max_length=255, null=False)
-
+    filter_json = models.JSONField(default=dict, blank=True)
+    
+    pool_limit = models.IntegerField(default=200)
+    sort_by = models.CharField(
+        max_length=40,
+        choices=[
+            ("popular", "Popularity"),
+            ("rating", "Rating"),
+            ("new", "Release date"),
+        ],
+        default="popular",
+    )
+    
     class Meta:
         db_table = 'categories'
-        managed = False
+        managed = True
 
 class Review(models.Model):
     user = models.CharField(max_length=255, null=False)
@@ -91,7 +102,7 @@ class Review(models.Model):
 
     class Meta:
         db_table = 'reviews'
-        managed = False
+        managed = True
 
 class Ranking(models.Model):
     user = models.CharField(max_length=255, null=False)
@@ -103,6 +114,6 @@ class Ranking(models.Model):
         return self.user + " " + str(self.categoryCode)
     class Meta:
         db_table = 'rankings'
-        managed = False
+        managed = True
 
 

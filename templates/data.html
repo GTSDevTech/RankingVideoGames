@@ -103,36 +103,114 @@
 <div class="boss-modal" id="collectionsModal" aria-hidden="true">
   <div class="boss-modal__backdrop" data-close></div>
 
-  <div class="boss-modal__panel" role="dialog" aria-modal="true" aria-label="Crear categoría">
+  <div class="boss-modal__panel" role="dialog" aria-modal="true">
     <button class="boss-modal__close" type="button" data-close aria-label="Cerrar">×</button>
 
     <h3 class="boss-modal__title">Create Category</h3>
-    <p class="boss-modal__sub">Add a new category for rankings.</p>
+    <p class="boss-modal__sub">Define rules for a ranking category</p>
 
     <form class="boss-form" method="post" action="{% url 'create_news_categories' %}">
       {% csrf_token %}
 
-      <label class="boss-label">
-        Code
-        <input class="boss-input" type="number" name="code" min="1" required placeholder="101" />
-      </label>
+      <!-- SCROLL BODY (no rompe nada y respeta alto máximo) -->
+      <div class="boss-modal__body">
 
-      <label class="boss-label">
-        Name
-        <input class="boss-input" type="text" name="name" maxlength="255" required placeholder="Top JRPG" />
-      </label>
+        <!-- BASIC INFO -->
+        <label class="boss-label">
+          Name
+          <input class="boss-input" type="text" name="name" required placeholder="Top JRPG 90s" />
+        </label>
 
-      <label class="boss-label">
-        Description
-        <textarea class="boss-textarea" name="description" rows="4" maxlength="255" required
-          placeholder="JRPG with epic history and fighting to turns..."></textarea>
-      </label>
+        <label class="boss-label">
+          Description
+          <textarea class="boss-textarea" name="description" rows="3" required
+            placeholder="Best JRPG released during the 1990s"></textarea>
+        </label>
 
-      <div class="boss-form__actions">
+        <!-- DATE FILTER (2 datepickers PRO en la misma fila) -->
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="boss-label">From year</label>
+            <div class="boss-datewrap">
+              <input
+                class="boss-input"
+                type="text"
+                id="yearFrom"
+                name="year_from"
+                placeholder="1990"
+                autocomplete="off"
+              />
+              <i class="bx bx-calendar boss-dateicon"></i>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="boss-label">To year</label>
+            <div class="boss-datewrap">
+              <input
+                class="boss-input"
+                type="text"
+                id="yearTo"
+                name="year_to"
+                placeholder="1999"
+                autocomplete="off"
+              />
+              <i class="bx bx-calendar boss-dateicon"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLATFORMS (multi-select, sin comas) -->
+        <label class="boss-label">
+          Platforms
+          <select class="boss-input boss-multi" name="platforms_any" multiple>
+            {% for p in platform_options %}
+              <option value="{{ p }}">{{ p }}</option>
+            {% endfor %}
+          </select>
+          <small class="boss-help">Ctrl/Cmd para seleccionar varias</small>
+        </label>
+
+        <!-- GENRES (multi-select, sin comas) -->
+        <label class="boss-label">
+          Genres
+          <select class="boss-input boss-multi" name="genres_any" multiple>
+            {% for g in genre_options %}
+              <option value="{{ g }}">{{ g }}</option>
+            {% endfor %}
+          </select>
+          <small class="boss-help">Ctrl/Cmd para seleccionar varias</small>
+        </label>
+
+        <!-- EXTRA RULES -->
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="boss-label">
+              Minimum votes
+              <input class="boss-input" type="number" name="min_votes" min="0" value="0">
+            </label>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="boss-label">
+              Pool size (max games shown)
+              <input class="boss-input" type="number" name="pool_limit" min="20" max="500" value="200">
+            </label>
+          </div>
+        </div>
+
+        <!-- Order pool by: solo popular -->
+        <input type="hidden" name="sort_by" value="popular">
+
+      </div>
+
+      <!-- ACTIONS (sticky abajo dentro del panel) -->
+      <div class="boss-form__actions boss-modal__footer">
         <button type="button" class="boss-btn boss-btn--ghost" data-close>Cancel</button>
-        <button type="submit" class="boss-btn boss-btn--primary">Save</button>
+        <button type="submit" class="boss-btn boss-btn--primary">Save Category</button>
       </div>
     </form>
+
   </div>
 </div>
 

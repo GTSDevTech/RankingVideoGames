@@ -119,3 +119,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeModal();
   });
 });
+
+ const fromEl = document.getElementById("yearFrom");
+  const toEl = document.getElementById("yearTo");
+
+  if (window.mdb && fromEl && toEl) {
+    const dpFrom = new mdb.Datepicker(fromEl, {
+      format: "yyyy",
+      startView: "years",
+      minView: "years",
+    });
+
+    const dpTo = new mdb.Datepicker(toEl, {
+      format: "yyyy",
+      startView: "years",
+      minView: "years",
+    });
+
+    // Optional: auto-correct range (si from > to)
+    const normalize = () => {
+      const y1 = parseInt(fromEl.value, 10);
+      const y2 = parseInt(toEl.value, 10);
+      if (!Number.isNaN(y1) && !Number.isNaN(y2) && y1 > y2) {
+        // swap
+        const tmp = fromEl.value;
+        fromEl.value = toEl.value;
+        toEl.value = tmp;
+      }
+    };
+
+    fromEl.addEventListener("change", normalize);
+    toEl.addEventListener("change", normalize);
+  }

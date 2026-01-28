@@ -6,6 +6,7 @@ from rankvideogames.forms import *
 from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login, logout
 from rankvideogames.models import VideoGame
+import json
 
 
 # Create your views here.
@@ -107,81 +108,138 @@ def logout_user(request):
     return redirect("go_login")
 
 
+
 def load_data_movies(request):
-    
+
     if request.method != "POST":
         messages.error(request, "Elige un archivo.")
         return redirect("go_data")
-    
-    if request.method == "POST":
-        update_file = request.FILES.get("update_file")
-        if not update_file:
-            messages.error(request, "No se ha seleccionado ningún archivo.")
-            return redirect("go_data")
 
-        decode_file = update_file.read().decode("utf-8").splitlines()
-        reader = csv.DictReader(decode_file)
+    update_file = request.FILES.get("update_file")
+    if not update_file:
+        messages.error(request, "No se ha seleccionado ningún archivo.")
+        return redirect("go_data")
 
-        required_cols = {
+    decoded_file = update_file.read().decode("utf-8-sig").splitlines()
+    reader = csv.DictReader(decoded_file)
+
+    required_cols = {
         "id", "name", "slug", "first_release_date", "platforms", "genres",
         "developers", "publishers", "total_rating", "total_rating_count",
         "cover_id", "cover_url",
-        }
-        
-        header = reader.fieldnames or []
-        header_set = {h.strip() for h in header if h}
+    }
 
-        missing = sorted(required_cols - header_set)
-        if missing:
-            messages.error(
-                request,
-                "CSV inválido. Faltan columnas: " + ", ".join(missing)
-            )
-            return redirect("go_data")
+    header = reader.fieldnames or []
+    header_set = {h.strip() for h in header if h and h.strip()}
 
-        count = 0
-        skipped = 0
-
-        for row in reader:
-            row_id = (row.get("id") or "").strip()
-            if not row_id:
-                skipped += 1
-                continue
-
-            if VideoGame.objects.filter(id=row_id).exists():
-                skipped += 1
-                continue
-            try:
-                videogame = VideoGame()
-                videogame.id = row['id']
-                videogame.name = row['name']
-                videogame.slug = row['slug']
-                videogame.first_release_date = row['first_release_date']
-                videogame.platforms = row['platforms']
-                videogame.genres = row['genres']
-                videogame.developers = row['developers']
-                videogame.publishers = row['publishers']
-                videogame.total_rating = row['total_rating']
-                videogame.total_rating_count = row['total_rating_count']
-                videogame.cover_id = row['cover_id']
-                videogame.cover_url = row['cover_url']
-
-                videogame.save()
-                count += 1
-            except Exception as e:  
-                skipped += 1
-                continue
-
-        if count == 0:
-            messages.warning(request, f"No se insertó ningún registro. O ya existían o el CSV tenía filas inválidas (omitidas: {skipped}).")
-        else:
-            messages.success(request, f"CSV cargado: {count} registros. Omitidos: {skipped}.")
+    missing = sorted(required_cols - header_set)
+    if missing:
+        messages.error(request, "CSV inválido. Faltan columnas: " + ", ".join(missing))
         return redirect("go_data")
+
+    count = 0
+    skipped = 0
+
+    for row in reader:
+        row_id = (row.get("id") or "").strip()
+        if not row_id:
+            skipped += 1
+            continue
+        try:
+            game_id = int(row_id)
+        except:
+            skipped += 1
+            continue
+
+        if VideoGame.objects.filter(id=game_id).exists():
+            skipped += 1
+            continue
+
+        try:
+            videogame = VideoGame()
+            videogame.id = game_id
+
+            videogame.name = (row.get("name") or "").strip()
+            videogame.slug = (row.get("slug") or "").strip()
+
+            videogame.first_release_date = (row.get("first_release_date") or "").strip()
+            videogame.platforms = (row.get("platforms") or "").strip()
+            videogame.genres = (row.get("genres") or "").strip()
+            videogame.developers = (row.get("developers") or "").strip()
+            videogame.publishers = (row.get("publishers") or "").strip()
+            
+            tr = (row.get("total_rating") or "").strip()
+            trc = (row.get("total_rating_count") or "").strip()
+            
+            videogame.total_rating = tr if tr != "" else 0
+            videogame.total_rating_count = trc if trc != "" else 0
+            cid = (row.get("cover_id") or "").strip()
+            videogame.cover_id = int(cid) if cid.isdigit() else None
+
+            videogame.cover_url = (row.get("cover_url") or "").strip()
+
+            videogame.save()
+            count += 1
+
+        except Exception:
+            skipped += 1
+            continue
+
+    if count == 0:
+        messages.warning(request, f"No se insertó ningún registro. O ya existían o el CSV tenía filas inválidas (omitidas: {skipped}).")
+    else:
+        messages.success(request, f"CSV cargado: {count} registros. Omitidos: {skipped}.")
+
+    return redirect("go_data")
+
     
 
 def create_news_categories(request):
-    
-    
-    return render(request, "go_data.html")
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
 
+        year_from = request.POST.get("year_from")
+        year_to = request.POST.get("year_to")
+        platforms_any = request.POST.get("platforms_any")
+        genres_any = request.POST.get("genres_any")
+        min_votes = int(request.POST.get("min_votes") or 0)
+        pool_limit = int(request.POST.get("pool_limit") or 200)
+        sort_by = request.POST.get("sort_by") or "popular"
 
+        # build filter_json
+        filter_json = {}
+
+        if year_from:
+            filter_json["date_from"] = f"{year_from}-01-01"
+        if year_to:
+            filter_json["date_to"] = f"{year_to}-12-31"
+
+        if platforms_any:
+            filter_json["platform_any"] = [
+                p.strip() for p in platforms_any.split(",") if p.strip()
+            ]
+
+        if genres_any:
+            filter_json["genres_any"] = [
+                g.strip() for g in genres_any.split(",") if g.strip()
+            ]
+
+        if min_votes > 0:
+            filter_json["min_votes"] = min_votes
+
+        last = Category.objects.order_by("code").last()
+        next_code = (last.code if last else 0) + 1
+
+        Category.objects.create(
+            code=next_code,
+            name=name,
+            description=description,
+            filter_json=filter_json,
+            pool_limit=pool_limit,
+            sort_by=sort_by,
+        )
+
+        return redirect("go_data")
+
+    return redirect("go_data")
