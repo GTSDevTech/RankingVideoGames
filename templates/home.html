@@ -1,7 +1,6 @@
 
 {% extends 'base.html' %}
 
-
 {% load text_filters %}
 {% block nav %}
   {% include 'includes/nav.html' %}
@@ -11,79 +10,72 @@
 
 {% block body %}
 <main class="home-content">
-  <div class="container-fluid min-vh-100 px-5 align-items-flex-start d-flex-column justify-content-center">
+  <div class="container-fluid min-vh-100 px-5">
 
-    <div class="games-header pt-5 mb-5">
-      <h2 class="text-center m-0">All Games</h2>
-      
-    </div>
-  <section class="games-grid">
-  {% for g in page_obj %}
-  <article class="game-card js-tilt js-game-open">
-
-    <!-- INNER: la pieza que rota -->
-    <div class="game-card__inner">
-
-      <!-- FRONT-->
-      <div class="game-card__front">
-        <div class="game-cover js-tilt-cover">
-          {% if g.cover_url %}
-            <img src="{{ g.cover_url }}" alt="{{ g.name }}">
-          {% else %}
-            <div class="cover-fallback">No cover</div>
-          {% endif %}
+    <div class="games-header pt-4 mb-4">
+      <div class="games-header__inner">
+        <div class="games-header__title">
+          <i class="bx bxs-joystick"></i>
+          <h2 class="m-0">All Games</h2>
         </div>
-
-        <div class="game-body js-tilt-body">
-          <h3 class="game-title js-tilt-title" title="{{ g.name }}">{{ g.name }}</h3>
-
-          <div class="game-meta js-tilt-meta">
-            {% if g.platforms %}
-              {% for p in g.platforms|split:"|" %}
-                <span class="meta-pill">{{ p }}</span>
-              {% endfor %}
-            {% else %}
-              <span class="meta-pill">Unknown platform</span>
-            {% endif %}
-
-            {% if g.genres %}
-              {% for genre in g.genres|split:"|" %}
-                <span class="meta-pill meta-genre">{{ genre }}</span>
-              {% endfor %}
-            {% else %}
-              <span class="meta-pill meta-genre">Unknown genre</span>
-            {% endif %}
-          </div>
-        </div>
+        <div class="games-header__sub">Browse the catalogue · Click a card to view details</div>
       </div>
-
-      <!-- BACK: reverso TCG fijo -->
-      <div class="game-card__back" aria-hidden="true"></div>
-
     </div>
 
-    <!--Datos ocultos (igual) -->
-    <section class="game-hidden" hidden>
-      <span data-field="id">{{ g.id }}</span>
-      <span data-field="slug">{{ g.slug|default:'' }}</span>
-      <span data-field="release">{{ g.first_release_date|default:"" }}</span>
-      <span data-field="developers">{{ g.developers|default:'' }}</span>
-      <span data-field="publishers">{{ g.publishers|default:'' }}</span>
-      <span data-field="rating">{{ g.total_rating|stringformat:"s"|default:"" }}</span>
-      <span data-field="rating_count">{{ g.total_rating_count|stringformat:"s"|default:"" }}</span>
-      <span data-field="cover">{{ g.cover_url|default:'' }}</span>
-      <span data-field="platforms">{{ g.platforms|default:'' }}</span>
-      <span data-field="genres">{{ g.genres|default:'' }}</span>
-      <span data-field="name">{{ g.name|default:'' }}</span>
-    </section>
+    <div class="row g-4 align-items-start home-layout">
 
-  </article>
-  {% endfor %}
-</section>
+      <!-- MAIN GRID -->
+      <section class="col-12 col-lg-9">
+        <section class="games-grid">
+          {% for g in page_obj %}
+          <article class="game-card js-tilt js-game-open">
+            <div class="game-card__inner">
+              <div class="game-card__front">
+                <div class="game-cover js-tilt-cover">
+                  {% if g.cover_url %}
+                    <img src="{{ g.cover_url }}" alt="{{ g.name }}">
+                  {% else %}
+                    <div class="cover-fallback">{{ g.name }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="game-body js-tilt-body">
+                  <h3 class="game-title js-tilt-title" title="{{ g.name }}">{{ g.name }}</h3>
+
+                  <div class="game-meta js-tilt-meta">
+                    {% if g.platforms %}
+                      {% for p in g.platforms|split:"|" %}
+                        <span class="meta-pill">{{ p }}</span>
+                      {% endfor %}
+                    {% else %}
+                      <span class="meta-pill">Unknown platform</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="game-card__back" aria-hidden="true"></div>
+      
+            <section class="game-hidden" hidden>
+              <span data-field="id">{{ g.id }}</span>
+              <span data-field="slug">{{ g.slug|default:'' }}</span>
+              <span data-field="release">{{ g.first_release_date|default:"" }}</span>
+              <span data-field="developers">{{ g.developers|default:'' }}</span>
+              <span data-field="publishers">{{ g.publishers|default:'' }}</span>
+              <span data-field="rating">{{ g.total_rating|stringformat:"s"|default:"" }}</span>
+              <span data-field="rating_count">{{ g.total_rating_count|stringformat:"s"|default:"" }}</span>
+              <span data-field="cover">{{ g.cover_url|default:'' }}</span>
+              <span data-field="platforms">{{ g.platforms|default:'' }}</span>
+              <span data-field="genres">{{ g.genres|default:'' }}</span>
+              <span data-field="name">{{ g.name|default:'' }}</span>
+            </section>
+          </article>
+          {% endfor %}
+        </section>
 
 
-    <!-- PAGINATION -->
-    <nav class="pagination-wrap" aria-label="Games pagination">
+    <!-- PAGINATION (igual que lo tienes) -->
+      <nav class="pagination-wrap" aria-label="Games pagination">
       <ul class="pagination pagination-gamer justify-content-center">
 
         {% if page_obj.has_previous %}
@@ -95,7 +87,7 @@
             <span class="page-link page-link-back">«</span>
         </li>
         {% endif %}
-        {# ventana de páginas: 5 alrededor #}
+        {# ventana de páginas: 3 alrededor #}
         {% for num in page_obj.paginator.page_range %}
           {% if num >= page_obj.number|add:"-3" and num <= page_obj.number|add:"3" %}
             {% if page_obj.number == num %}
@@ -120,7 +112,111 @@
         Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
       </p>
     </nav>
+  </section>
+  <!-- SIDEBAR (mock visual, sin lógica) -->
+      <aside class="col-12 col-lg-3 right-panel">
+        <div class="home-sidebar">
 
+          <!-- Última review (mock usando el primer item de la página, sin backend) -->
+          <div class="home-panel mb-3">
+            <div class="home-panel__head">
+              <div>
+                <div class="home-panel__title">Última review</div>
+                <div class="home-panel__sub">Vista rápida (mock)</div>
+              </div>
+              <i class="bx bxs-star"></i>
+            </div>
+
+            <div class="home-panel__body">
+              {% for g in page_obj %}
+                {% if forloop.first %}
+                  <div class="side-card">
+                    <div class="side-cover">
+                      {% if g.cover_url %}
+                        <img src="{{ g.cover_url }}" alt="{{ g.name }}">
+                      {% else %}
+                        <div class="cover-fallback">No cover</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="side-info">
+                      <div class="side-title" title="{{ g.name }}">{{ g.name }}</div>
+                      <div class="side-sub">
+                        Rating: <strong>{{ g.total_rating|stringformat:"s"|default:"—" }}</strong>
+                        <span class="side-dot">•</span>
+                        Votes: <strong>{{ g.total_rating_count|stringformat:"s"|default:"—" }}</strong>
+                      </div>
+                      <div class="side-mini">
+                        <span class="chip">Review #1</span>
+                        <span class="chip chip-alt">Mock</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Últimos comentarios (mock) -->
+          <div class="home-panel mb-3">
+            <div class="home-panel__head">
+              <div>
+                <div class="home-panel__title">Últimos comentarios</div>
+                <div class="home-panel__sub">Solo visual por ahora</div>
+              </div>
+              <i class="bx bxs-message-rounded-dots"></i>
+            </div>
+
+            <div class="home-panel__body">
+              <div class="comment-row">
+                <div class="comment-avatar">GT</div>
+                <div class="comment-text">
+                  <strong>@user1</strong>
+                  <div class="comment-snippet">“Este juego me sorprendió…”</div>
+                </div>
+              </div>
+
+              <div class="comment-row">
+                <div class="comment-avatar">AB</div>
+                <div class="comment-text">
+                  <strong>@user2</strong>
+                  <div class="comment-snippet">“Top recomendado para 2000s.”</div>
+                </div>
+              </div>
+
+              <div class="comment-row">
+                <div class="comment-avatar">MK</div>
+                <div class="comment-text">
+                  <strong>@user3</strong>
+                  <div class="comment-snippet">“La portada y el diseño están 🔥”</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranking / Top (mock) -->
+          <div class="home-panel">
+            <div class="home-panel__head">
+              <div>
+                <div class="home-panel__title">Ranking destacado</div>
+                <div class="home-panel__sub">Solo para ver cómo queda</div>
+              </div>
+              <i class="bx bxs-trophy"></i>
+            </div>
+
+            <div class="home-panel__body">
+              <div class="rank-row"><span class="rank-pill">#1</span> <span>Game A</span></div>
+              <div class="rank-row"><span class="rank-pill">#2</span> <span>Game B</span></div>
+              <div class="rank-row"><span class="rank-pill">#3</span> <span>Game C</span></div>
+              <div class="rank-row"><span class="rank-pill">#4</span> <span>Game D</span></div>
+              <div class="rank-row"><span class="rank-pill">#5</span> <span>Game E</span></div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
   </div>
 </main>
 

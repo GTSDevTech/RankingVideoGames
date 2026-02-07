@@ -301,58 +301,64 @@
 /* ===== MODAL ===== */
 .boss-modal{
   display: none;
+  width: 100%;
   position: fixed;
   inset: 0;
   z-index: 50000;
+  overflow-y: auto;                 /* scroll del modal (página del modal) */
+  -webkit-overflow-scrolling: touch;
+  padding: 28px 12px;
 }
 .boss-modal.is-open{ display: block; }
 
 .boss-modal__backdrop{
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,.65);
 }
 
+/* Mantén el tono "data": panel oscuro suave, inputs claros */
 .boss-modal__panel{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(640px, calc(100% - 24px));
+  position: relative;
+  margin: 0 auto;
+  width: min(1020px, calc(100% - 24px));
   border-radius: 18px;
-  background: rgba(15,12,41,.92);
-  border: 1px solid rgba(46,226,255,.45);
   box-shadow: 0 20px 60px rgba(0,0,0,.55);
   padding: 18px;
+  background: rgba(15,12,41,.92);
+  border: 1px solid rgba(46,226,255,.35);
   color: #e5e7eb;
+}
 
-  /* ✅ respeta alto máximo */
-  max-height: min(82vh, 720px);
-  display: flex;
-  flex-direction: column;
+@media (min-width: 992px){
+  .boss-modal__panel{
+    width: min(1180px, calc(100% - 64px));
+    padding: 20px 22px;
+  }
 }
 
 .boss-modal__close{
   position: absolute;
-  top: 10px;
-  right: 10px;
-  left: auto;
+  top: 12px;
+  right: 12px;
+
   width: 42px;
   height: 42px;
   border-radius: 999px;
   border: 1px solid rgba(56,189,248,.35);
-  background: rgb(210, 4, 194, 0.7);
+  background: rgba(210,4,194,.72);
   color: #fff;
   font-size: 24px;
   cursor: pointer;
-  transform: none;
-  z-index: 999999;
+
+  z-index: 10;
 }
 
 .boss-modal__title{
-  margin: 6px 0 2px;
+  margin: 4px 0 4px;
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
+  color: #ffffff;
 }
 
 .boss-modal__sub{
@@ -364,78 +370,155 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 0;
 }
 
-/* ✅ body scrolleable para no romper el alto */
+/* El body scrollea, el footer NO */
 .boss-modal__body{
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  max-height: calc(82vh - 140px);   /* deja sitio para título + footer */
   overflow: auto;
-  min-height: 0;
   padding-right: 6px;
 }
 
-/* footer sticky */
+/* Footer siempre abajo sin montarse */
 .boss-modal__footer{
-  position: sticky;
-  bottom: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end;        /* derecha */
   gap: 10px;
-  margin-top: 10px;
-  padding-top: 12px;
-  background: linear-gradient(to top, rgba(15,12,41,.92) 70%, rgba(15,12,41,0));
+  padding-top: 14px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
 }
 
+/* Si quieres centrado en móvil */
+@media (max-width: 520px){
+  .boss-modal__footer{ justify-content: center; }
+}
+
+/* Labels más visibles */
 .boss-label{
   display: grid;
   gap: 6px;
-  font-weight: 700;
-  color: rgba(229,231,235,.9);
+  font-weight: 800;
+  color: rgba(255,255,255,.92);
+}
+.boss-label--small{
+  font-size: .9rem;
+  font-weight: 900;
 }
 
-.boss-input,
-.boss-textarea{
+/* Inputs claros (lo que querías) */
+.boss-input--light{
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(168,85,247,.28);
-  background: rgba(255,255,255,.06);
-  color: #fff;
-  padding: 10px 12px;
+  background: rgba(255,255,255,.95) !important;
+  border: 1px solid rgba(46,226,255,.25) !important;
+  color: #0f0c29 !important;
+}
+.boss-input--light:focus{
   outline: none;
+  border-color: rgba(46,226,255,.6) !important;
+  box-shadow: 0 0 0 3px rgba(46,226,255,.15);
+  width: 100%;
 }
 
-.boss-form__actions{
+/* Secciones con borde bien marcado */
+.boss-section{
+  border-radius: 14px;
+  border: 2px solid rgba(168,85,247,.52);
+  background: rgba(255,255,255,.04);
+  padding: 12px;
+}
+
+.boss-section__head{
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
 }
 
-/* multi selects controlados */
-.boss-multi{
-  min-height: 140px;
-  max-height: 180px;
-  overflow: auto;
+.boss-section__title{
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  letter-spacing: .3px;
+  color: rgba(255,255,255,.92);
 }
 
 .boss-help{
-  display:block;
-  margin-top: 4px;
   font-size: .85rem;
-  color: rgba(229,231,235,.65);
+  color: rgba(229,231,235,.68);
 }
 
-/* datepicker wrapper + icon */
-.boss-datewrap{
-  position: relative;
+/* Chips */
+.boss-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 2px dashed rgba(46,226,255,.55); 
+  background: rgba(0,0,0,.10);
 }
-.boss-dateicon{
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  color: rgba(46,226,255,.85);
-  pointer-events: none;
+
+.boss-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(168,85,247,.28);
+  background: rgba(255,255,255,.06);
+  color: rgba(229,231,235,.92);
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .16s ease;
+}
+
+.boss-chip:hover{
+  border-color: rgba(168,85,247,.55);
+  background: rgba(168,85,247,.12);
+}
+
+.boss-chip.is-selected{
+  border-color: rgba(46,226,255,.75);
+  background: rgba(46,226,255,.16);
+  color: #e5e7eb;
+}
+
+.boss-chip__x{
+  font-weight: 900;
+  opacity: .9;
+}
+
+/* Scroll interno solo para listas largas, sin romper layout */
+.boss-chips--platforms,
+.boss-chips--genres{
+  max-height: 220px;
+  overflow: auto;
+}
+
+/* Años en la misma fila */
+.boss-years{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 520px){
+  .boss-years{ grid-template-columns: 1fr; }
+}
+
+/* Grid 2 para rules + basic (si lo necesitas) */
+.boss-grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.boss-grid-2 .span-2{
+  grid-column: 1 / -1;
+}
+@media (max-width: 680px){
+  .boss-grid-2{ grid-template-columns: 1fr; }
+  .boss-grid-2 .span-2{ grid-column: auto; }
 }

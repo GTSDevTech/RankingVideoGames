@@ -88,7 +88,7 @@ class Category(models.Model):
     
     class Meta:
         db_table = 'categories'
-        managed = True
+        managed = False
 
 class Review(models.Model):
     user = models.CharField(max_length=255, null=False)
@@ -102,7 +102,7 @@ class Review(models.Model):
 
     class Meta:
         db_table = 'reviews'
-        managed = True
+        managed = False
 
 class Ranking(models.Model):
     user = models.CharField(max_length=255, null=False)
@@ -114,6 +114,6 @@ class Ranking(models.Model):
         return self.user + " " + str(self.categoryCode)
     class Meta:
         db_table = 'rankings'
-        managed = True
+        managed = False
 
 

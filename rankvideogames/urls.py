@@ -7,11 +7,13 @@ urlpatterns = [
     path('logout/', logout_user, name='logout'),
     path('home/', go_home, name='go_home'),
     path('ranking/', go_ranking, name='go_ranking'),
-    path('review/', go_review, name='go_review'),
+    path('review/', go_statistics, name='go_review'),
     path('data/', go_data, name='go_data'),
     path('games/', go_games, name='go_games'),
     path('users/', go_users, name='go_users'),
     path("boss/load-data/", load_data_movies, name="load_data_movies"),
     path("boss/create-news-categories/", create_news_categories, name="create_news_categories"),
-
+    # APIs
+    path("api/ranking/pool/", ranking_pool_api, name="ranking_pool_api"),
+    path("api/ranking/save/", save_ranking, name="save_ranking"),
 ]

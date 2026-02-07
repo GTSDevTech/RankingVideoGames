@@ -109,111 +109,167 @@
     <h3 class="boss-modal__title">Create Category</h3>
     <p class="boss-modal__sub">Define rules for a ranking category</p>
 
-    <form class="boss-form" method="post" action="{% url 'create_news_categories' %}">
+    <form class="boss-form" id="categoryForm" method="post" action="{% url 'create_news_categories' %}">
       {% csrf_token %}
 
-      <!-- SCROLL BODY (no rompe nada y respeta alto máximo) -->
+      <input type="hidden" name="platforms_any_json" id="platformsJson" value="[]">
+      <input type="hidden" name="genres_any_json" id="genresJson" value="[]">
+      <input type="hidden" name="decades_any_json" id="decadesJson" value="[]">
+
+      <!-- BODY SCROLLEABLE (solo contenido) -->
       <div class="boss-modal__body">
 
         <!-- BASIC INFO -->
-        <label class="boss-label">
-          Name
-          <input class="boss-input" type="text" name="name" required placeholder="Top JRPG 90s" />
-        </label>
-
-        <label class="boss-label">
-          Description
-          <textarea class="boss-textarea" name="description" rows="3" required
-            placeholder="Best JRPG released during the 1990s"></textarea>
-        </label>
-
-        <!-- DATE FILTER (2 datepickers PRO en la misma fila) -->
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <label class="boss-label">From year</label>
-            <div class="boss-datewrap">
-              <input
-                class="boss-input"
-                type="text"
-                id="yearFrom"
-                name="year_from"
-                placeholder="1990"
-                autocomplete="off"
-              />
-              <i class="bx bx-calendar boss-dateicon"></i>
-            </div>
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Basic</span>
+            <small class="boss-help">Name + description</small>
           </div>
 
-          <div class="col-12 col-md-6">
-            <label class="boss-label">To year</label>
-            <div class="boss-datewrap">
-              <input
-                class="boss-input"
-                type="text"
-                id="yearTo"
-                name="year_to"
-                placeholder="1999"
-                autocomplete="off"
-              />
-              <i class="bx bx-calendar boss-dateicon"></i>
+          <div class="boss-grid-2">
+            <label class="boss-label span-2">
+              Name
+              <input class="boss-input boss-input--light" type="text" name="name" required placeholder="Top JRPG 90s">
+            </label>
+
+            <label class="boss-label span-2">
+              Description
+              <textarea class="boss-textarea boss-input--light" name="description" rows="3" required
+                placeholder="Best JRPG released during the 1990s"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <!-- DECADES (ARRIBA) -->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Decades</span>
+            <small class="boss-help">Click to select/deselect. Selecting a decade sets the year range.</small>
+          </div>
+
+          <div class="boss-chips" id="decadeChips">
+            {% for d in decade_options %}
+              <button type="button" class="boss-chip" data-group="decades" data-value="{{ d }}">
+                <span>{{ d }}s</span><span class="boss-chip__x">+</span>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- YEARS-->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Years</span>
+            <small class="boss-help">Manual range (auto-updated by decade)</small>
+          </div>
+
+          <div class="boss-years">
+            <div class="boss-years__col">
+              <label class="boss-label boss-label--small">From year</label>
+              <select class="boss-input boss-input--light" name="year_from" id="yearFromSelect">
+                <option value="">Any</option>
+                {% for y in year_options %}
+                  <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="boss-years__col">
+              <label class="boss-label boss-label--small">To year</label>
+              <select class="boss-input boss-input--light" name="year_to" id="yearToSelect">
+                <option value="">Any</option>
+                {% for y in year_options %}
+                  <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- PLATFORMS (multi-select, sin comas) -->
-        <label class="boss-label">
-          Platforms
-          <select class="boss-input boss-multi" name="platforms_any" multiple>
+        <!-- PLATFORM BRANDS -->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Platform brands</span>
+            <small class="boss-help">Filter the platform list so it stays manageable.</small>
+          </div>
+
+          <div class="boss-chips boss-chips--brands" id="platformBrandChips">
+            <button type="button" class="boss-chip is-selected" data-brand="all"><span>All</span><span class="boss-chip__x">×</span></button>
+            <button type="button" class="boss-chip" data-brand="nintendo"><span>Nintendo</span><span class="boss-chip__x">+</span></button>
+            <button type="button" class="boss-chip" data-brand="sony"><span>Sony</span><span class="boss-chip__x">+</span></button>
+            <button type="button" class="boss-chip" data-brand="microsoft"><span>Microsoft</span><span class="boss-chip__x">+</span></button>
+            <button type="button" class="boss-chip" data-brand="sega"><span>Sega</span><span class="boss-chip__x">+</span></button>
+            <button type="button" class="boss-chip" data-brand="pc"><span>PC</span><span class="boss-chip__x">+</span></button>
+            <button type="button" class="boss-chip" data-brand="other"><span>Other</span><span class="boss-chip__x">+</span></button>
+          </div>
+        </div>
+
+        <!-- PLATFORMS -->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Platforms</span>
+            <small class="boss-help">Click to select/deselect.</small>
+          </div>
+
+          <div class="boss-chips boss-chips--platforms" id="platformChips">
             {% for p in platform_options %}
-              <option value="{{ p }}">{{ p }}</option>
+              <button type="button" class="boss-chip" data-group="platforms" data-value="{{ p|escape }}">
+                <span>{{ p }}</span><span class="boss-chip__x">+</span>
+              </button>
             {% endfor %}
-          </select>
-          <small class="boss-help">Ctrl/Cmd para seleccionar varias</small>
-        </label>
+          </div>
+        </div>
 
-        <!-- GENRES (multi-select, sin comas) -->
-        <label class="boss-label">
-          Genres
-          <select class="boss-input boss-multi" name="genres_any" multiple>
+        <!-- GENRES -->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Genres</span>
+            <small class="boss-help">Click to select/deselect.</small>
+          </div>
+
+          <div class="boss-chips boss-chips--genres" id="genreChips">
             {% for g in genre_options %}
-              <option value="{{ g }}">{{ g }}</option>
+              <button type="button" class="boss-chip" data-group="genres" data-value="{{ g|escape }}">
+                <span>{{ g }}</span><span class="boss-chip__x">+</span>
+              </button>
             {% endfor %}
-          </select>
-          <small class="boss-help">Ctrl/Cmd para seleccionar varias</small>
-        </label>
+          </div>
+        </div>
 
-        <!-- EXTRA RULES -->
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
+        <!-- RULES -->
+        <div class="boss-section">
+          <div class="boss-section__head">
+            <span class="boss-section__title">Rules</span>
+            <small class="boss-help">Limits</small>
+          </div>
+
+          <div class="boss-grid-2">
             <label class="boss-label">
               Minimum votes
-              <input class="boss-input" type="number" name="min_votes" min="0" value="0">
+              <input class="boss-input boss-input--light" type="number" name="min_votes" min="0" value="0">
             </label>
-          </div>
 
-          <div class="col-12 col-md-6">
             <label class="boss-label">
               Pool size (max games shown)
-              <input class="boss-input" type="number" name="pool_limit" min="20" max="500" value="200">
+              <input class="boss-input boss-input--light" type="number" name="pool_limit" min="20" max="500" value="200">
             </label>
           </div>
-        </div>
 
-        <!-- Order pool by: solo popular -->
-        <input type="hidden" name="sort_by" value="popular">
+          <input type="hidden" name="sort_by" value="popular">
+        </div>
 
       </div>
 
-      <!-- ACTIONS (sticky abajo dentro del panel) -->
-      <div class="boss-form__actions boss-modal__footer">
+      <!-- FOOTER FIXED (no se monta, siempre visible) -->
+      <div class="boss-modal__footer boss-form__actions">
         <button type="button" class="boss-btn boss-btn--ghost" data-close>Cancel</button>
         <button type="submit" class="boss-btn boss-btn--primary">Save Category</button>
       </div>
     </form>
-
   </div>
 </div>
 
-<script src="{% static 'js/data-cards.js' %}"></script>
+
+<script src="/static/js/data-cards.js"></script>
 
 {% endblock %}

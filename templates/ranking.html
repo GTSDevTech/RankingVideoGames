@@ -7,9 +7,9 @@
 
 {% block body %}
 <main class="ranking-content ranking-page">
-  <div class="container-fluid align-items-center py-4 d-flex justify-content-center align-content-center min-vh-100">
+  <div class="container align-items-center py-4 d-flex justify-content-center align-content-start min-vw-100">
 
-    <div class="row g-3 align-items-start min-vw-100 px-5">
+    <div class="row g-3 align-items-start px-5 main-row-rk-panel">
 
       <!-- LEFT: creator + selected preview -->
       <aside class="col-12 col-lg-3">
@@ -23,12 +23,13 @@
 
           <div class="rk-panel__body">
             <label class="rk-label">Categoría</label>
-            <select id="categorySelect" class="form-select rk-select">
-              <option value="platforms_1980s">Plataformas (1980s)</option>
-              <option value="platforms_1990s">Plataformas (1990s)</option>
-              <option value="platforms_2000s">Plataformas (2000s)</option>
-              <option value="platforms_2010s">Plataformas (2010s)</option>
-              <option value="platforms_2020s">Plataformas (2020s)</option>
+
+            <select id="categorySelect"
+                    class="form-select rk-select"
+                    data-api-base="{{ ranking_pool_api_url }}">
+              {% for c in categories %}
+                <option value="{{ c.code }}">{{ c.name }}</option>
+              {% endfor %}
             </select>
 
             <button id="resetBtn" class="btn rk-btn-reset w-100 mt-3">
@@ -69,11 +70,18 @@
           <div class="rk-hero__body">
             <div id="top5List" class="rk-top5"></div>
           </div>
+
+          <div class="p-3 align-items-center justify-content-center d-flex gap-3 flex-column">
+            <button id="saveRankingBtn" class="btn rk-btn-reset w-25 btn-save" type="button">
+              <i class="bx bxs-trophy"></i> Guardar ranking
+            </button>
+            <small id="saveMsg" class="text-white-50 d-block"></small>
+          </div>
         </div>
       </section>
 
       <!-- RIGHT: search + pool -->
-      <aside class="col-12 col-lg-3">
+      <aside class="col-12 col-lg-3 max-hv-80">
         <div class="rk-panel rk-panel--cyan mb-3">
           <div class="rk-panel__head">
             <div>
@@ -98,7 +106,7 @@
         <div class="rk-pool-wrap">
           <div id="poolGrid" class="rk-pool"></div>
         </div>
- 
+
         <small class="text-white-50 d-block mt-2">
           Tip: arrastra desde el Top 5 hacia el listado para quitar.
         </small>

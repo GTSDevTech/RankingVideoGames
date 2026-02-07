@@ -30,11 +30,11 @@
           {% elif user.role == 2 %}
           <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'go_home' %}active{% endif %}"
-                href="{% url 'go_home' %}">Home</a>
+                href="{% url 'go_home' %}">Review</a>
           </li>
                 <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'go_review' %}active{% endif %}"
-            href="{% url 'go_review' %}">Reviews</a>
+            href="{% url 'go_review' %}">Statistics</a>
           </li>
 
           <li class="nav-item">
@@ -75,7 +75,7 @@
   </div>
 </nav>
    {% if user.is_authenticated %}
-          {% if user.role == 2 %}
+          {% if user.role == 2 and request.resolver_match.url_name != 'go_ranking' %}
   <section class="home-toolbar">
     <div class="container-fluid container-toolbar">
       <div class="toolbar-top">

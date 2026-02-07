@@ -1,4 +1,4 @@
-html,
+
 body.bg-ranking{
   box-sizing: border-box;
   width: 100% !important;
@@ -11,6 +11,35 @@ body.bg-ranking{
   background-size: cover;
   background-attachment: fixed;
 }
+
+.ranking-content{
+    position: relative;
+    top: 160px;
+    min-height: auto;
+    display: block;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-row-rk-panel{
+  width: 100% !important;
+  max-height: 80vh !important;
+
+}
+
+#saveRankingBtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+}
+#saveRankingBtn i{
+  font-size: 1.15rem;
+}
+
+
 /* Panels */
 .rk-panel{
   border-radius: 18px;
@@ -129,7 +158,7 @@ body.bg-ranking{
   background: rgba(15, 12, 41, 0.55);
   box-shadow: 0 12px 30px rgba(0,0,0,0.30);
   padding: 12px;
-  max-height: calc(100vh - 240px);
+  max-height: calc(100vh - 440px);
   overflow: auto;
 }
 
@@ -274,6 +303,7 @@ body.bg-ranking{
   transform: scale(1.01);
   background: rgba(190,227,240,0.10);
 }
+/* Icon inside rank badge */
 .rk-rank{
   width: 56px;
   height: 56px;
@@ -281,11 +311,40 @@ body.bg-ranking{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight: 1000;
-  color:#0b1020;
   background: linear-gradient(135deg, #0ebeef, #2ee2ff);
   box-shadow: 0 0 16px rgba(46,226,255,0.25);
+  position: relative;
 }
+
+/* Icon styling */
+.rk-rank i{
+  font-size: 1.55rem;
+  line-height: 1;
+  color: #0b1020;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+}
+
+/* Optional: different “medal” colors per position (sin tocar tu paleta general) */
+.rk-rank--1{
+  background: linear-gradient(135deg, #ffd54a, #ff9f1c);
+  box-shadow: 0 0 16px rgba(255, 200, 60, 0.30);
+}
+.rk-rank--2{
+  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+  box-shadow: 0 0 16px rgba(229, 231, 235, 0.25);
+}
+.rk-rank--3{
+  background: linear-gradient(135deg, #d97706, #92400e);
+  box-shadow: 0 0 16px rgba(217, 119, 6, 0.25);
+}
+.rk-rank--4{
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+}
+.rk-rank--5{
+  background: linear-gradient(135deg, #d204c2, #ff2ed6);
+  box-shadow: 0 0 16px rgba(210, 4, 194, 0.22);
+}
+
 .rk-slot-body{
   height: 100%;
   border-radius: 14px;
@@ -340,12 +399,17 @@ body.bg-ranking{
 }
 
 
-.ranking-content{
-    min-height: 100% !important;
-    display: block;
-    flex-direction: column;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
+.rk-slot.filled .rk-slot-body{
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  min-height: 0;
 }
 
+.rk-slot.filled .rk-item{
+  height: 100%;
+  align-self: stretch;
+}
+
+.rk-slot .rk-slot-body{ min-height: 0; }
