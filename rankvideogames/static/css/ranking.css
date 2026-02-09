@@ -6,10 +6,18 @@ body.bg-ranking{
   font-family: 'Inter', sans-serif;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  background-image: url('/static/img/switch_games.png') !important;
+  background-image: url('/static/img/landscape.jpg') !important;
   background-repeat: no-repeat !important;
   background-size: cover;
   background-attachment: fixed;
+}
+
+.bg-ranking::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(83, 83, 83, 0.55);
+  z-index: -1;
 }
 
 .ranking-content{
@@ -28,6 +36,124 @@ body.bg-ranking{
   max-height: 80vh !important;
 
 }
+
+.rk-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+}
+.rk-modal.is-open{ display:block; }
+
+.rk-modal__backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  backdrop-filter: blur(6px);
+}
+
+.rk-modal__panel{
+  position:relative;
+  height:100%;
+  overflow:auto;
+  justify-content: center;
+  align-content: center;
+}
+
+.rk-modal__close{
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(56,189,248,0.22);
+  background: rgba(15, 12, 41, 0.70);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index: 10000;
+}
+
+.games-header{
+  justify-content: center !important;
+}
+
+.rank-card-mini {
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(56,189,248,0.18);
+}
+
+.rank-card-mini__title {
+  font-weight: 900;
+  color: #fff;
+  font-size: .95rem;
+}
+
+.rank-card-mini__meta {
+  font-size: .75rem;
+  color: rgba(229,231,235,.6);
+  margin-bottom: 6px;
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .85rem;
+  color: #fff;
+}
+
+.rank-pill {
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+  color: #0b1020;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: .1rem .45rem;
+  font-size: .7rem;
+}
+
+.ranking-panel{
+
+  display: flex;
+  align-self: flex-start;
+  justify-content: center;
+
+}
+
+.home-panel{
+
+  width: 100% !important;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Modal */
 
 #saveRankingBtn{
   display: inline-flex;
@@ -413,3 +539,5 @@ body.bg-ranking{
 }
 
 .rk-slot .rk-slot-body{ min-height: 0; }
+
+

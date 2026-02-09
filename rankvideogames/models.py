@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django_mongodb_backend.fields import ArrayField
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django_mongodb_backend.fields import ObjectIdAutoField
 from django.db import models
 from django.utils import timezone
 
@@ -29,10 +30,15 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         (1, 'Admin'),
         (2, 'Client')
     )
-
+    GENDERS = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+    
     email = models.EmailField(max_length=255, null=False, unique=True)
     username = models.CharField(max_length=255, null=False, unique=True)
     role = models.IntegerField(choices=ROLES, null=False)
+    gender = models.CharField(max_length=1,choices=GENDERS,null=False,blank=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -48,7 +54,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
 
 class VideoGame(models.Model):
-    id = models.IntegerField(primary_key=True, null=False)
+    id = models.IntegerField(primary_key=True, null=False, unique=True)
     name = models.CharField(max_length=255, null=False)
     slug = models.SlugField(max_length=255, null=False)
     first_release_date = models.CharField(max_length=255, null=False)
@@ -70,42 +76,48 @@ class VideoGame(models.Model):
         return self.name
 
 class Category(models.Model):
-    code = models.IntegerField(unique=True)
-    name = models.CharField(max_length=255, null=False)
+    code = models.IntegerField(primary_key=True, unique=True)
+    name = models.CharField(max_length=255, null=False, unique=True)
     description = models.CharField(max_length=255, null=False)
+    games = ArrayField(models.IntegerField(), null=True, blank=True, default=list)
+
     filter_json = models.JSONField(default=dict, blank=True)
-    
-    pool_limit = models.IntegerField(default=200)
+
+    pool_limit = models.IntegerField(default=20)
     sort_by = models.CharField(
-        max_length=40,
-        choices=[
-            ("popular", "Popularity"),
-            ("rating", "Rating"),
-            ("new", "Release date"),
-        ],
-        default="popular",
+    max_length=40,
+    choices=[
+        ("popular", "Popularity"),
+        ("rating", "Rating"),
+        ("new", "Release date"),
+    ],
+    default="popular",
     )
-    
+
     class Meta:
         db_table = 'categories'
         managed = False
 
-class Review(models.Model):
-    user = models.CharField(max_length=255, null=False)
-    videoGameCode = models.IntegerField(null=False)
-    reviewDate = models.DateField(default=timezone.now)
-    rating = models.IntegerField(null=False, validators=[MinValueValidator(0), MaxValueValidator(5)])
-    comments = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.user + " " + str(self.rating)
+class Review(models.Model):
+    
+    _id = ObjectIdAutoField(primary_key=True)
+    user = models.CharField(max_length=255, null=False) 
+    videoGameCode = models.IntegerField(null=False)
+    reviewDate = models.DateTimeField(default=timezone.now) 
+    rating = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
+    comments = models.TextField(blank=True, default="")     
 
     class Meta:
         db_table = 'reviews'
         managed = False
+       
 
 class Ranking(models.Model):
+    
+    _id = ObjectIdAutoField(primary_key=True)
     user = models.CharField(max_length=255, null=False)
+    name = models.CharField(max_length=255, null=False)
     ranking_date = models.DateField(default=timezone.now)
     categoryCode = models.IntegerField(null=False)
     rating = ArrayField(models.IntegerField(),null=True, blank=True, default=list)

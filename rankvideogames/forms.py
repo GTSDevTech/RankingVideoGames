@@ -4,12 +4,17 @@ from rankvideogames.models import *
 
 
 class RegisterForm(forms.ModelForm):
+    GENDERS = (
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+    )
+    gender = forms.ChoiceField(choices=GENDERS, required=True)
     password = forms.CharField(widget=forms.PasswordInput)
     repeat_password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = Usuario
-        fields = ("username", "email")
+        fields = ("username", "email", "gender")
 
 
     def clean(self):
@@ -25,7 +30,8 @@ class RegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password"])
-        user.role = 2 
+        user.role = 2
+        user.gender = self.cleaned_data.get("gender")
         if commit:
             user.save()
         return user

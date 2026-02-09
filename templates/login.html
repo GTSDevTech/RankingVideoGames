@@ -8,6 +8,123 @@
     --inactive-color: #cbd5e1;
   }
 
+  
+
+  /* ========== Gender cards ========== */
+
+.rk-gender__grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.rk-gender-card{
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  background: rgba(58, 53, 53, 0.42);;
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  user-select: none;
+}
+
+.rk-gender-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(14, 190, 239, 0.55);
+  box-shadow:
+    0 0 10px rgba(14, 190, 239, 0.18),
+    0 0 10px rgba(168, 85, 247, 0.12);
+}
+
+.rk-gender-card input[type="radio"]{
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rk-gender-card__ico{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.rk-gender-card__ico i{
+  font-size: 22px;
+  color: rgba(229,231,235,0.92);
+}
+
+.rk-gender-card__title{
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.rk-gender-card__sub{
+  font-size: .82rem;
+  color: rgba(229,231,235,0.65);
+}
+
+.rk-gender-card__check{
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  font-size: 18px;
+  opacity: 0;
+  transform: scale(.9);
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.rk-gender-card:has(input[type="radio"][value="F"]:checked){
+  border-color: rgba(210, 4, 194, 0.65);
+  box-shadow:
+    0 0 14px rgba(210, 4, 194, 0.28),
+    0 0 18px rgba(255, 46, 214, 0.14);
+}
+
+.rk-gender-card:has(input[type="radio"][value="F"]:checked) .rk-gender-card__ico{
+  background: linear-gradient(135deg, var(--login-color), #ff2ed6);
+  border: none;
+}
+
+.rk-gender-card:has(input[type="radio"][value="F"]:checked) .rk-gender-card__ico i{
+  color: #0b1020;
+}
+
+.rk-gender-card:has(input[type="radio"][value="F"]:checked) .rk-gender-card__check{
+  color: #ff2ed6;
+}
+
+.rk-gender-card:has(input[type="radio"]:checked){
+  background: rgba(15, 12, 41, 0.70);
+  border-color: rgba(14, 190, 239, 0.65);
+  box-shadow:
+    0 0 14px rgba(14, 190, 239, 0.28),
+    0 0 18px rgba(14, 190, 239, 0.14);
+}
+
+.rk-gender-card:has(input[type="radio"]:checked) .rk-gender-card__ico{
+  background: linear-gradient(135deg, var(--register-color), #2ee2ff);
+  border: none;
+}
+
+.rk-gender-card:has(input[type="radio"]:checked) .rk-gender-card__ico i{
+  color: #0b1020;
+}
+
+.rk-gender-card:has(input[type="radio"]:checked) .rk-gender-card__check{
+  opacity: 1;
+  transform: scale(1);
+  color: #2ee2ff;
+}
+
   #authTabs.nav.nav-pills {
     gap: 0 !important; 
   }
@@ -238,6 +355,41 @@
                         />
                         <label class="form-label" for="registerRepeatPassword">Repeat password</label>
                       </div>
+                      <div class="rk-gender mb-4">
+                       
+                        <div class="rk-gender__grid">
+                          <label class="rk-gender-card">
+                            <input type="radio" name="gender" value="M" required
+                                  {% if register_form.gender.value == "M" %}checked{% endif %}>
+                            <div class="rk-gender-card__ico">
+                              <i class="bx bx-male-sign"></i>
+                            </div>
+                            <div class="rk-gender-card__txt">
+                              <div class="rk-gender-card__title">Male</div>
+                              <div class="rk-gender-card__sub">Masculino</div>
+                            </div>
+                            <i class="bx bx-check rk-gender-card__check"></i>
+                          </label>
+
+                          <label class="rk-gender-card">
+                            <input type="radio" name="gender" value="F" required
+                                  {% if register_form.gender.value == "F" %}checked{% endif %}>
+                            <div class="rk-gender-card__ico">
+                              <i class="bx bx-female-sign"></i>
+                            </div>
+                            <div class="rk-gender-card__txt">
+                              <div class="rk-gender-card__title">Female</div>
+                              <div class="rk-gender-card__sub">Femenino</div>
+                            </div>
+                            <i class="bx bx-check rk-gender-card__check"></i>
+                          </label>
+                        </div>
+
+                        {% if register_form.gender.errors %}
+                          <div class="text-danger small mt-2">{{ register_form.gender.errors }}</div>
+                        {% endif %}
+                      </div>
+
 
                       <div class="pt-1 mb-4">
                         <button class="btn btn-dark btn-lg w-100" type="submit">

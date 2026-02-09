@@ -1,120 +1,248 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
+
 {% block body_class %}bg-ranking{% endblock %}
 
 {% block body %}
+
 <main class="ranking-content ranking-page">
-  <div class="container align-items-center py-4 d-flex justify-content-center align-content-start min-vw-100">
 
-    <div class="row g-3 align-items-start px-5 main-row-rk-panel">
+  <div class="games-header pt-4 mb-4">
+      <div class="games-header__inner">
+        <div class="games-header__title">
+          <i class="bx bxs-trophy"></i>
+          <h2 class="m-0">Rankings</h2>
+        </div>
+        <div class="games-header__sub">Created your Ranking (click to build your Top 5)</div>
+      </div>
+  </div>
+  <div class="container p-5 min-vw-100">
+    <section class="boss-wrapper">
 
-      <!-- LEFT: creator + selected preview -->
-      <aside class="col-12 col-lg-3">
-        <div class="rk-panel rk-panel--blue mb-3">
-          <div class="rk-panel__head">
-            <div>
-              <div class="rk-title">Creador de ranking</div>
-              <div class="rk-subtitle">Elige categoría y arma tu Top 5</div>
-            </div>
-          </div>
-
-          <div class="rk-panel__body">
-            <label class="rk-label">Categoría</label>
-
-            <select id="categorySelect"
-                    class="form-select rk-select"
-                    data-api-base="{{ ranking_pool_api_url }}">
-              {% for c in categories %}
-                <option value="{{ c.code }}">{{ c.name }}</option>
-              {% endfor %}
-            </select>
-
-            <button id="resetBtn" class="btn rk-btn-reset w-100 mt-3">
-              <i class="bx bx-refresh"></i> Reset ranking
-            </button>
-
-            <div class="rk-stats mt-3">
-              <span>Seleccionados</span>
-              <span><strong id="filledCount">0</strong>/5</span>
-            </div>
+      <!-- GRID CATEGORIES -->
+      <section class="boss-section mt-4">
+        <div class="boss-section__head">
+          <div>
+            <h3 class="boss-section__title">Categories</h3>
+            <p class="boss-section__sub">Created collections (click to build your Top 5)</p>
           </div>
         </div>
 
-        <div class="rk-panel rk-panel--purple">
-          <div class="rk-panel__head">
-            <div>
-              <div class="rk-title">Top seleccionado</div>
-              <div class="rk-subtitle">Vista rápida de lo que llevas</div>
-            </div>
-          </div>
-          <div class="rk-panel__body">
-            <div id="selectedList" class="rk-selected"></div>
-          </div>
-        </div>
-      </aside>
+        <div class="boss-cat-wrapper">
+          <div class="boss-cat-grid">
+            {% for c in categories %}
+              <article class="boss-cat-card"
+                data-code="{{ c.code }}"
+                data-name="{{ c.name|escape }}"
+                data-description="{{ c.description|escape }}"
+                data-games='{{ c.games|default:"[]"|safe }}'>
 
-      <!-- CENTER: big Top5 card with slots -->
-      <section class="col-12 col-lg-6">
-        <div class="rk-hero">
-          <div class="rk-hero__head">
-            <div>
-              <div class="rk-hero__title">TOP 5 RANKING</div>
-              <div class="rk-hero__subtitle">Arrastra desde la derecha · Reordena soltando en otra posición</div>
-            </div>
-            <div class="rk-badge">Drag & Drop</div>
-          </div>
+                <div class="boss-cat-card__top">
+                  <span class="boss-cat-pill">#{{ c.code }}</span>
+                  <span class="boss-cat-name" title="{{ c.name }}">{{ c.name }}</span>
+                </div>
 
-          <div class="rk-hero__body">
-            <div id="top5List" class="rk-top5"></div>
-          </div>
+                <div class="boss-cat-meta">
+                  <span class="boss-cat-chip">Games: {{ c.games|length|default:"—" }}</span>
+                  <span class="boss-cat-chip boss-cat-chip--alt">Sort: {{ c.sort_by|default:"popular" }}</span>
+                </div>
 
-          <div class="p-3 align-items-center justify-content-center d-flex gap-3 flex-column">
-            <button id="saveRankingBtn" class="btn rk-btn-reset w-25 btn-save" type="button">
-              <i class="bx bxs-trophy"></i> Guardar ranking
-            </button>
-            <small id="saveMsg" class="text-white-50 d-block"></small>
+                <div class="boss-cat-desc">
+                  {{ c.description|default:"No description" }}
+                </div>
+
+              </article>
+            {% empty %}
+              <div class="text-white-50">
+                No categories yet. Create one from “Add Categories”.
+              </div>
+            {% endfor %}
           </div>
         </div>
       </section>
+    </section>
+      <!-- RIGHT: SIDEBAR -->
+      <aside class="col-12 col-lg-3 mt-4 ranking-panel">
 
-      <!-- RIGHT: search + pool -->
-      <aside class="col-12 col-lg-3 max-hv-80">
-        <div class="rk-panel rk-panel--cyan mb-3">
-          <div class="rk-panel__head">
+        <div class="home-panel mb-3">
+          <div class="home-panel__head">
             <div>
-              <div class="rk-title">Listado</div>
-              <div class="rk-subtitle">Busca y arrastra al Top 5</div>
+              <div class="home-panel__title">Last Rankings</div>
+              <div class="home-panel__sub">Globals (latest)</div>
             </div>
-            <div class="rk-mini">
-              <span>Items</span>
-              <strong id="poolCount">0</strong>
-            </div>
+            <i class="bx bxs-trophy"></i>
           </div>
 
-          <div class="rk-panel__body">
-            <div class="rk-search">
-              <i class="bx bx-search"></i>
-              <input id="searchInput" class="rk-search__input" type="text" placeholder="Buscar…">
-              <button id="clearSearchBtn" class="rk-search__clear" type="button">Limpiar</button>
-            </div>
+          <div class="home-panel__body">
+
+            {% if last_rankings %}
+              {% for rk in last_rankings %}
+                <div class="rank-card-mini mb-3">
+
+                  <div class="rank-card-mini__head">
+                    <div class="rank-card-mini__title">
+                      {{ rk.name|default:"Ranking" }}
+                    </div>
+                    <div class="rank-card-mini__meta">
+                      @{{ rk.user }} {{ rk.category_code }} · {{ rk.ranking_date|date:"d/m/Y" }}
+                    </div>
+                  </div>
+
+                  <div class="rank-card-mini__body">
+                    {% for game_id in rk.top5 %}
+                      <div class="rank-row">
+                        <span class="rank-pill">#{{ forloop.counter }}</span>
+                        <span>Game {{ game_id }}</span>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-white-50">
+                No hay rankings todavía.
+              </div>
+            {% endif %}
+
           </div>
         </div>
 
-        <div class="rk-pool-wrap">
-          <div id="poolGrid" class="rk-pool"></div>
-        </div>
-
-        <small class="text-white-50 d-block mt-2">
-          Tip: arrastra desde el Top 5 hacia el listado para quitar.
-        </small>
       </aside>
-
-    </div>
   </div>
+
 </main>
 
-<script src="/static/js/ranking.js"></script>
+<!-- RANKING MODAL (FULLSCREEN) - FUERA DEL MAIN -->
+<div id="rankingBuilderWrap" class="rk-modal" aria-hidden="true">
+  <div class="rk-modal__backdrop" data-close></div>
+
+  <div class="rk-modal__panel" role="dialog" aria-modal="true" aria-label="Ranking builder">
+    <button type="button" class="rk-modal__close" data-close aria-label="Close">×</button>
+
+    <div class="container align-items-center py-4 d-flex justify-content-center align-content-start min-vw-100">
+      <div class="row g-3 align-items-start px-5 main-row-rk-panel">
+
+        <!-- LEFT -->
+        <aside class="col-12 col-lg-3">
+          <div class="rk-panel rk-panel--blue mb-3">
+            <div class="rk-panel__head">
+              <div>
+                <div class="rk-title">Creador de ranking</div>
+                <div class="rk-subtitle">Elige categoría y arma tu Top 5</div>
+              </div>
+            </div>
+
+            <div class="rk-panel__body">
+              <label class="rk-label" for="rankingNameInput">Nombre del ranking</label>
+              <input
+                id="rankingNameInput"
+                class="form-control rk-select"
+                type="text"
+                maxlength="255"
+                placeholder="Ej: Mis indies favoritos"
+                autocomplete="off"/>
+
+              <div class="mt-3"></div>
+              <label class="rk-label">Categoría</label>
+
+              <select id="categorySelect"
+                class="form-select rk-select"
+                data-api-base="{% url 'ranking_pool_api' %}">
+                {% for c in categories %}
+                  <option value="{{ c.code }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+
+              <button id="resetBtn" class="btn rk-btn-reset w-100 mt-3" type="button">
+                <i class="bx bx-refresh"></i> Reset ranking
+              </button>
+
+              <div class="rk-stats mt-3">
+                <span>Seleccionados</span>
+                <span><strong id="filledCount">0</strong>/5</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rk-panel rk-panel--purple">
+            <div class="rk-panel__head">
+              <div>
+                <div class="rk-title">Top seleccionado</div>
+                <div class="rk-subtitle">Vista rápida de lo que llevas</div>
+              </div>
+            </div>
+            <div class="rk-panel__body">
+              <div id="selectedList" class="rk-selected"></div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- CENTER -->
+        <section class="col-12 col-lg-6">
+          <div class="rk-hero">
+            <div class="rk-hero__head">
+              <div>
+                <div class="rk-hero__title">TOP 5 RANKING</div>
+                <div class="rk-hero__subtitle">Arrastra desde la derecha · Reordena soltando</div>
+              </div>
+              <div class="rk-badge">Drag & Drop</div>
+            </div>
+
+            <div class="rk-hero__body">
+              <div id="top5List" class="rk-top5"></div>
+            </div>
+
+            <div class="p-3 align-items-center justify-content-center d-flex gap-3 flex-column">
+              <button id="saveRankingBtn" class="btn rk-btn-reset w-25 btn-save" type="button">
+                <i class="bx bxs-trophy"></i> Guardar ranking
+              </button>
+              <small id="saveMsg" class="text-white-50 d-block"></small>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT -->
+        <aside class="col-12 col-lg-3 max-hv-80">
+          <div class="rk-panel rk-panel--cyan mb-3">
+            <div class="rk-panel__head">
+              <div>
+                <div class="rk-title">Listado</div>
+                <div class="rk-subtitle">Busca y arrastra al Top 5</div>
+              </div>
+              <div class="rk-mini">
+                <span>Items</span>
+                <strong id="poolCount">0</strong>
+              </div>
+            </div>
+
+            <div class="rk-panel__body">
+              <div class="rk-search">
+                <i class="bx bx-search"></i>
+                <input id="searchInput" class="rk-search__input" type="text" placeholder="Buscar…">
+                <button id="clearSearchBtn" class="rk-search__clear" type="button">Limpiar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rk-pool-wrap">
+            <div id="poolGrid" class="rk-pool"></div>
+          </div>
+
+          <small class="text-white-50 d-block mt-2">
+            Tip: arrastra desde el Top 5 hacia el listado para quitar.
+          </small>
+        </aside>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="{% static 'js/ranking.js' %}"></script>
 {% endblock body %}

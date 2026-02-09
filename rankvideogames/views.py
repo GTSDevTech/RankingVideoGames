@@ -1,4 +1,6 @@
 import csv
+from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from collections import Counter
 from django.contrib import messages
@@ -8,9 +10,10 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from rankvideogames.forms import *
-from rankvideogames.models import VideoGame, Category, Ranking
+from rankvideogames.models import VideoGame, Category, Ranking, Review
 import json
 from datetime import datetime
+from django.utils import timezone
 
 
 
@@ -60,7 +63,7 @@ def go_home(request):
     "id","name","slug","first_release_date",
     "platforms","genres","developers","publishers",
     "total_rating","total_rating_count","cover_url"
-    )   
+    ).order_by("name")   
 
     paginator = Paginator(qs, 36)  
     page_number = request.GET.get("page")
@@ -71,6 +74,7 @@ def go_home(request):
     })
 
 
+@login_required
 def go_users(request):
 
     qu = Usuario.objects.all().exclude(role=1)
@@ -87,75 +91,74 @@ def go_games(request):
     return render(request, "games.html")
 
 
-def go_data(request):
-    cached = cache.get("boss_options_v1")
-    if cached:
-        return render(request, "data.html", cached)
+    
+@login_required
+@require_GET
+def my_ranking_api(request):
+    code = (request.GET.get("category") or "").strip()
+    if not code.isdigit():
+        return JsonResponse({"error": "category missing"}, status=400)
 
-    plat_counter = Counter()
-    genre_counter = Counter()
-    years = set()
+    rk = Ranking.objects.filter(user=request.user.username, categoryCode=int(code)).first()
+    if not rk:
+        return JsonResponse({"error": "not found"}, status=404)
 
-    qs = VideoGame.objects.all().only("platforms", "genres", "first_release_date")
+    return JsonResponse({
+        "categoryCode": int(rk.categoryCode),
+        "top5": list(rk.rating or []),
+        "date": rk.ranking_date.isoformat() if rk.ranking_date else None,
+        "name": rk.name or "",
+    })
 
-    # esto evita petar RAM
-    for vg in qs.iterator(chunk_size=2000):
-        for p in _split_pipe(vg.platforms):
-            plat_counter[p] += 1
-
-        # genres viene como "A | B | C" -> _split_pipe ya lo soporta
-        for g in _split_pipe(vg.genres):
-            genre_counter[g] += 1
-
-        y = _parse_year(vg.first_release_date)
-        if y:
-            years.add(y)
-
-    # Opciones (top N para que el modal sea usable)
-    platform_options = [k for k, _ in plat_counter.most_common(80)]
-    genre_options = [k for k, _ in genre_counter.most_common(80)]
-
-    # Años para selects y décadas para chips
-    year_options = sorted(years, reverse=True)
-    decade_options = sorted({(y // 10) * 10 for y in years}, reverse=True)
-
-    ctx = {
-        "platform_options": platform_options,
-        "genre_options": genre_options,
-        "year_options": year_options,
-        "decade_options": decade_options,
-    }
-
-    cache.set("boss_options_v1", ctx, 60 * 60 * 12)
-    return render(request, "data.html", ctx)
-
-
+@login_required
 def go_ranking(request):
-    categories = list(Category.objects.order_by("code").only("code", "name", "description"))
+    categories = list(
+        Category.objects
+        .order_by("code")
+        .only("code", "name", "description", "games", "sort_by")
+    )
+
+    last_rankings = list(
+        Ranking.objects
+        .order_by("-ranking_date")[:3]
+    )
+
     return render(request, "ranking.html", {
         "categories": categories,
-        "ranking_pool_api_url": "/api/ranking/pool/",  # simple, sin reverse para tocar lo mínimo
+        "last_rankings": last_rankings,
     })
-    
 
+@login_required
+@require_POST
 def save_ranking(request):
-    data = json.loads(request.body.decode("utf-8"))
-    category = int(data["categoryCode"])
-    top5 = data["top5"]  # lista de 5 ids (int)
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        category = int(data["categoryCode"])
+        top5 = data["top5"]
+    except Exception:
+        return JsonResponse({"error": "invalid payload"}, status=400)
 
-    if len(top5) != 5:
+    if not isinstance(top5, list) or len(top5) != 5:
         return JsonResponse({"error": "Top5 incompleto"}, status=400)
 
-    Ranking.objects.create(
-        user=str(request.user),           # o request.user.username
-        ranking_date=timezone.now().date(),
+    top5_clean = []
+    for x in top5:
+        try:
+            top5_clean.append(int(x))
+        except Exception:
+            return JsonResponse({"error": "Top5 inválido"}, status=400)
+
+    obj, created = Ranking.objects.update_or_create(
+        user=request.user.username,
         categoryCode=category,
-        rating=top5
+        defaults={
+            "ranking_date": timezone.now().date(),
+            "rating": top5_clean,
+            "name": data.get("name") or "Mi ranking",
+        },
     )
-    return JsonResponse({"ok": True})
 
-
-
+    return JsonResponse({"ok": True, "updated": (not created)})
 
 
 def go_statistics(request):
@@ -300,43 +303,103 @@ def load_data_movies(request):
     return redirect("go_data")
 
 
+def go_data(request):
+
+    categories = list(Category.objects.order_by("code"))
+
+    for c in categories:
+        c.filter_json_str = json.dumps(getattr(c, "filter_json", {}) or {}, ensure_ascii=False)
+
+
+    saved_game_ids = set()
+    for c in categories:
+        for gid in (getattr(c, "games", None) or []):
+            try:
+                saved_game_ids.add(int(gid))
+            except:
+                pass
+
+    preview_games = list(
+        VideoGame.objects
+        .exclude(name__isnull=True).exclude(name="")
+        .only("id", "name", "platforms", "genres", "first_release_date", "cover_url", "total_rating_count")
+        .order_by("-total_rating_count")[:500]
+    )
+
+    if saved_game_ids:
+        existing_ids = {vg.id for vg in preview_games}
+        missing_ids = [gid for gid in saved_game_ids if gid not in existing_ids]
+        if missing_ids:
+            extra_games = list(
+                VideoGame.objects
+                .filter(id__in=missing_ids)
+                .only("id", "name", "platforms", "genres", "cover_url")
+            )
+
+            preview_games.extend(extra_games)
+
+    cached = cache.get("boss_options_v1")
+    if cached:
+        cached["categories"] = categories
+        cached["preview_games"] = preview_games
+        return render(request, "data.html", cached)
+
+    plat_counter = Counter()
+    genre_counter = Counter()
+    years = set()
+
+    qs = VideoGame.objects.all().only("platforms", "genres", "first_release_date")
+
+    for vg in qs.iterator(chunk_size=2000):
+        for p in _split_pipe(vg.platforms):
+            plat_counter[p] += 1
+        for g in _split_pipe(vg.genres):
+            genre_counter[g] += 1
+        y = _parse_year(vg.first_release_date)
+        if y:
+            years.add(y)
+
+    platform_options = [k for k, _ in plat_counter.most_common(80)]
+    genre_options = [k for k, _ in genre_counter.most_common(80)]
+    year_options = sorted(years, reverse=True)
+    decade_options = sorted({(y // 10) * 10 for y in years}, reverse=True)
+
+    ctx = {
+        "platform_options": platform_options,
+        "genre_options": genre_options,
+        "year_options": year_options,
+        "decade_options": decade_options,
+        "categories": categories,
+        "preview_games": preview_games,
+    }
+
+    cache.set("boss_options_v1", ctx, 60 * 60 * 12)
+    return render(request, "data.html", ctx)
+
+
+
+
 def create_news_categories(request):
     if request.method != "POST":
         return redirect("go_data")
 
     name = (request.POST.get("name") or "").strip()
     description = (request.POST.get("description") or "").strip()
-
-    year_from = (request.POST.get("year_from") or "").strip()
-    year_to = (request.POST.get("year_to") or "").strip()
-    min_votes = int(request.POST.get("min_votes") or 0)
-    pool_limit = int(request.POST.get("pool_limit") or 200)
-    sort_by = request.POST.get("sort_by") or "popular"
-
-    platforms_raw = request.POST.get("platforms_any_json") or "[]"
-    genres_raw = request.POST.get("genres_any_json") or "[]"
+    games_raw = request.POST.get("games") or "[]"
 
     try:
-        platforms = [str(x).strip() for x in json.loads(platforms_raw) if str(x).strip()]
-        genres = [str(x).strip() for x in json.loads(genres_raw) if str(x).strip()]
+        games = []
+        for x in json.loads(games_raw):
+            s = str(x).strip()
+            if s.isdigit():
+                games.append(int(s))
     except Exception:
-        messages.error(request, "Platforms/Genres inválidos.")
+        messages.error(request, "Lista de juegos inválida.")
         return redirect("go_data")
 
     if not name or not description:
         messages.error(request, "Name y Description son obligatorios.")
         return redirect("go_data")
-
-    filter_json = {
-        "platform_any": platforms,
-        "genres_any": genres,
-        "min_votes": min_votes,
-    }
-
-    if year_from.isdigit():
-        filter_json["year_from"] = int(year_from)
-    if year_to.isdigit():
-        filter_json["year_to"] = int(year_to)
 
     last_code = Category.objects.order_by("-code").values_list("code", flat=True).first() or 0
     next_code = last_code + 1
@@ -345,13 +408,17 @@ def create_news_categories(request):
         code=next_code,
         name=name,
         description=description,
-        filter_json=filter_json,
-        pool_limit=pool_limit,
-        sort_by=sort_by,
+        games=games,          
+        filter_json={},       
     )
 
+    cache.delete("boss_options_v1")
     messages.success(request, f"Categoría creada: {name}")
     return redirect("go_data")
+
+
+
+    
 
 
 def ranking_pool_api(request):
@@ -456,3 +523,307 @@ def ranking_pool_api(request):
         "category": {"code": cat.code, "name": cat.name},
         "items": items,
     })
+    
+
+def boss_preview_pool_api(request):
+ 
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"items": [], "error": "invalid json"}, status=400)
+
+    platforms = data.get("platforms") or []
+    genres = data.get("genres") or []
+    q = (data.get("q") or "").strip()
+
+    year_from = str(data.get("year_from") or "").strip()
+    year_to = str(data.get("year_to") or "").strip()
+
+    try:
+        min_votes = int(data.get("min_votes") or 0)
+    except Exception:
+        min_votes = 0
+
+    try:
+        pool_limit = int(data.get("pool_limit") or 200)
+    except Exception:
+        pool_limit = 200
+    pool_limit = max(20, min(pool_limit, 500))
+
+    sort_by = (data.get("sort_by") or "popular").strip()
+
+    qs = VideoGame.objects.all().only(
+        "id", "name", "platforms", "genres", "first_release_date",
+        "cover_url", "total_rating", "total_rating_count"
+    )
+
+    if q:
+        qs = qs.filter(name__icontains=q)
+
+    if min_votes > 0:
+        qs = qs.filter(total_rating_count__gte=min_votes)
+
+    if platforms:
+        q_plat = Q()
+        for p in platforms:
+            p = str(p).strip()
+            if p:
+                q_plat |= Q(platforms__icontains=p)
+        qs = qs.filter(q_plat)
+
+    if genres:
+        q_gen = Q()
+        for g in genres:
+            g = str(g).strip()
+            if g:
+                q_gen |= Q(genres__icontains=g)
+        qs = qs.filter(q_gen)
+
+    # years
+    if year_from.isdigit() or year_to.isdigit():
+        now_year = datetime.utcnow().year
+        y1 = int(year_from) if year_from.isdigit() else 1970
+        y2 = int(year_to) if year_to.isdigit() else now_year
+        if y1 > y2:
+            y1, y2 = y2, y1
+        y2 = min(y2, now_year)
+
+        start = f"{y1:04d}-01-01"
+        end = f"{y2:04d}-12-31"
+        qs = qs.filter(first_release_date__gte=start, first_release_date__lte=end)
+
+    if sort_by == "rating":
+        qs = qs.order_by("-total_rating")
+    elif sort_by == "new":
+        qs = qs.order_by("-first_release_date")
+    else:
+        qs = qs.order_by("-total_rating_count")
+
+    items = []
+    for vg in qs[:pool_limit]:
+        items.append({
+            "id": str(vg.id),
+            "name": vg.name or "",
+            "coverUrl": vg.cover_url or "",
+            "platforms": vg.platforms or "",
+        })
+
+    return JsonResponse({"items": items})
+
+
+
+def update_category(request, code):
+    if request.method != "POST":
+        return redirect("go_data")
+
+    cat = Category.objects.filter(code=code).first()
+    if not cat:
+        messages.error(request, "Categoría no encontrada.")
+        return redirect("go_data")
+
+    name = (request.POST.get("name") or "").strip()
+    description = (request.POST.get("description") or "").strip()
+    games_raw = request.POST.get("games") or "[]"
+
+    try:
+        games = []
+        for x in json.loads(games_raw):
+            s = str(x).strip()
+            if s.isdigit():
+                games.append(int(s))
+    except Exception:
+        messages.error(request, "Lista de juegos inválida.")
+        return redirect("go_data")
+
+    if not name or not description:
+        messages.error(request, "Name y Description son obligatorios.")
+        return redirect("go_data")
+
+    cat.name = name
+    cat.description = description
+    cat.games = games        # <-- MODO PROFE
+    cat.save()
+
+    cache.delete("boss_options_v1")
+    messages.success(request, f"Categoría actualizada: {name}")
+    return redirect("go_data")
+
+
+
+def delete_category(request, code):
+    if request.method != "POST":
+        return redirect("go_data")
+
+    cat = Category.objects.filter(code=code).first()
+    if not cat:
+        messages.error(request, "Categoría no encontrada.")
+        return redirect("go_data")
+
+    cat.delete()
+    messages.success(request, "Categoría eliminada.")
+    return redirect("go_data")
+
+
+@login_required
+@require_GET
+def my_review_api(request):
+    game = (request.GET.get("game") or "").strip()
+    if not game.isdigit():
+        return JsonResponse({"error": "game missing"}, status=400)
+
+    r = Review.objects.filter(user=request.user.username, videoGameCode=int(game)).first()
+    if not r:
+        return JsonResponse({"error": "not found"}, status=404)
+
+    return JsonResponse({
+        "rating": int(r.rating),
+        "comments": r.comments or "",
+        "date": r.reviewDate.isoformat() if r.reviewDate else None,
+    })
+
+
+@login_required
+@require_POST
+def save_review_api(request):
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        gameId = int(data.get("gameId"))
+        rating = int(data.get("rating"))
+    except Exception:
+        return JsonResponse({"error": "gameId/rating invalid"}, status=400)
+
+    if rating < 0 or rating > 5:
+        return JsonResponse({"error": "rating must be 0..5"}, status=400)
+
+    comments = (data.get("comments") or "").strip()
+    user_key = request.user.username
+
+    obj, created = Review.objects.update_or_create(
+        user=user_key,
+        videoGameCode=gameId,
+        defaults={
+            "rating": rating,
+            "comments": comments,
+            "reviewDate": timezone.now(),
+        },
+    )
+
+    return JsonResponse({"ok": True, "updated": (not created)})
+
+
+@login_required
+@require_GET
+def last_comments_api(request):
+    game = (request.GET.get("game") or "").strip()
+    if not game.isdigit():
+        return JsonResponse({"error": "game missing"}, status=400)
+
+    game_id = int(game)
+
+    qs = (
+        Review.objects
+        .filter(videoGameCode=game_id)
+        .exclude(comments="")
+        .order_by("-reviewDate")
+    )[:20]
+
+    items = []
+    for r in qs:
+        items.append({
+            "user": r.user,
+            "rating": int(r.rating) if r.rating is not None else None,
+            "comment": (r.comments or "").strip(),
+            "date": r.reviewDate.isoformat() if r.reviewDate else None,
+        })
+
+    return JsonResponse({"items": items})
+
+@login_required
+@require_GET
+def sidebar_last_review_api(request):
+    r = Review.objects.order_by("-reviewDate").first()
+    if not r:
+        return JsonResponse({"item": None})
+
+    try:
+        gid = int(r.videoGameCode)
+    except Exception:
+        return JsonResponse({"item": None})
+
+    vg = VideoGame.objects.filter(id=gid).only("id", "name", "cover_url").first()
+
+    return JsonResponse({
+        "item": {
+            "user": (r.user or "").strip(),
+            "gameId": gid,
+            "gameName": (vg.name if vg else "") or "",
+            "coverUrl": (vg.cover_url if vg else "") or "",
+            "rating": int(r.rating) if r.rating is not None else None,
+            "comment": (r.comments or "").strip(),
+            "date": r.reviewDate.isoformat() if r.reviewDate else None,
+        }
+    })
+
+
+@login_required
+@require_GET
+def sidebar_last_comments_api(request):
+    qs = (
+        Review.objects
+        .exclude(comments="")
+        .order_by("-reviewDate")
+    )[:10]
+
+    game_ids = []
+    for r in qs:
+        try:
+            game_ids.append(int(r.videoGameCode))
+        except Exception:
+            pass
+
+    games_map = {}
+    if game_ids:
+        for g in VideoGame.objects.filter(id__in=game_ids).only("id", "name", "cover_url"):
+            games_map[int(g.id)] = g
+
+    items = []
+    for r in qs:
+        try:
+            gid = int(r.videoGameCode)
+        except Exception:
+            continue
+
+        g = games_map.get(gid)
+
+        items.append({
+            "user": (r.user or "").strip(),
+            "gameId": gid,
+            "gameName": (g.name if g else "") or "",
+            "coverUrl": (g.cover_url if g else "") or "",
+            "rating": int(r.rating) if r.rating is not None else None,
+            "comment": (r.comments or "").strip(),
+            "date": r.reviewDate.isoformat() if r.reviewDate else None,
+        })
+
+    return JsonResponse({"items": items})
+
+@login_required
+@require_GET
+def game_rating_stats_api(request):
+    game = (request.GET.get("game") or "").strip()
+    if not game.isdigit():
+        return JsonResponse({"error": "game missing"}, status=400)
+
+    gid = int(game)
+
+    qs = Review.objects.filter(videoGameCode=gid)
+    count = qs.count()
+    if count == 0:
+        return JsonResponse({"gameId": gid, "avg": None, "count": 0})
+
+    total = 0
+    for r in qs.only("rating"):
+        total += int(r.rating or 0)
+
+    avg = round(total / count, 2)
+    return JsonResponse({"gameId": gid, "avg": avg, "count": count})

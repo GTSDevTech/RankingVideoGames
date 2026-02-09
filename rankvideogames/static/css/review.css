@@ -36,12 +36,14 @@ position: absolute;
 
 }
 
-.review-section h2{
-  background: linear-gradient(135deg, #d204c2, #ff2ed6) !important;
+
+.review-section .header-h2{
   padding: 0.5rem;
   border-radius: 30px;
   color: rgb(0, 0, 0, 1) !important;
-  opacity: 0.6;
+  opacity: 0.9;
+  color: #d204c2 !important;
+
 }
 
 

@@ -18,7 +18,7 @@
           <i class="bx bxs-joystick"></i>
           <h2 class="m-0">All Games</h2>
         </div>
-        <div class="games-header__sub">Browse the catalogue · Click a card to view details</div>
+        <div class="games-header__sub">Browse the catalogue · Click a card to view details & Rating the game</div>
       </div>
     </div>
 
@@ -74,7 +74,7 @@
         </section>
 
 
-    <!-- PAGINATION (igual que lo tienes) -->
+    <!-- PAGINATION-->
       <nav class="pagination-wrap" aria-label="Games pagination">
       <ul class="pagination pagination-gamer justify-content-center">
 
@@ -113,125 +113,82 @@
       </p>
     </nav>
   </section>
-  <!-- SIDEBAR (mock visual, sin lógica) -->
-      <aside class="col-12 col-lg-3 right-panel">
-        <div class="home-sidebar">
+  <aside class="col-12 col-lg-3 right-panel">
+    <div class="home-sidebar">
 
-          <!-- Última review (mock usando el primer item de la página, sin backend) -->
-          <div class="home-panel mb-3">
-            <div class="home-panel__head">
-              <div>
-                <div class="home-panel__title">Última review</div>
-                <div class="home-panel__sub">Vista rápida (mock)</div>
-              </div>
-              <i class="bx bxs-star"></i>
-            </div>
+      <!-- Última review (GLOBAL) -->
+      <div class="home-panel mb-3" id="sidebarLastReviewPanel">
+        <div class="home-panel__head">
+          <div>
+            <div class="home-panel__title">Última review</div>
+            <div class="home-panel__sub">Global (en vivo)</div>
+          </div>
+          <i class="bx bxs-star"></i>
+        </div>
 
-            <div class="home-panel__body">
-              {% for g in page_obj %}
-                {% if forloop.first %}
-                  <div class="side-card">
-                    <div class="side-cover">
-                      {% if g.cover_url %}
-                        <img src="{{ g.cover_url }}" alt="{{ g.name }}">
-                      {% else %}
-                        <div class="cover-fallback">No cover</div>
-                      {% endif %}
-                    </div>
+        <div class="home-panel__body">
 
-                    <div class="side-info">
-                      <div class="side-title" title="{{ g.name }}">{{ g.name }}</div>
-                      <div class="side-sub">
-                        Rating: <strong>{{ g.total_rating|stringformat:"s"|default:"—" }}</strong>
-                        <span class="side-dot">•</span>
-                        Votes: <strong>{{ g.total_rating_count|stringformat:"s"|default:"—" }}</strong>
-                      </div>
-                      <div class="side-mini">
-                        <span class="chip">Review #1</span>
-                        <span class="chip chip-alt">Mock</span>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
+  
+          <div id="sidebarLastReview"></div>
+
+
+          <div id="sidebarLastReviewEmpty" class="comment-snippet" style="display:none;">
+            No hay reviews todavía.
           </div>
 
-          <!-- Últimos comentarios (mock) -->
-          <div class="home-panel mb-3">
-            <div class="home-panel__head">
-              <div>
-                <div class="home-panel__title">Últimos comentarios</div>
-                <div class="home-panel__sub">Solo visual por ahora</div>
-              </div>
-              <i class="bx bxs-message-rounded-dots"></i>
-            </div>
-
-            <div class="home-panel__body">
-              <div class="comment-row">
-                <div class="comment-avatar">GT</div>
-                <div class="comment-text">
-                  <strong>@user1</strong>
-                  <div class="comment-snippet">“Este juego me sorprendió…”</div>
-                </div>
-              </div>
-
-              <div class="comment-row">
-                <div class="comment-avatar">AB</div>
-                <div class="comment-text">
-                  <strong>@user2</strong>
-                  <div class="comment-snippet">“Top recomendado para 2000s.”</div>
-                </div>
-              </div>
-
-              <div class="comment-row">
-                <div class="comment-avatar">MK</div>
-                <div class="comment-text">
-                  <strong>@user3</strong>
-                  <div class="comment-snippet">“La portada y el diseño están 🔥”</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Ranking / Top (mock) -->
-          <div class="home-panel">
-            <div class="home-panel__head">
-              <div>
-                <div class="home-panel__title">Ranking destacado</div>
-                <div class="home-panel__sub">Solo para ver cómo queda</div>
-              </div>
-              <i class="bx bxs-trophy"></i>
-            </div>
-
-            <div class="home-panel__body">
-              <div class="rank-row"><span class="rank-pill">#1</span> <span>Game A</span></div>
-              <div class="rank-row"><span class="rank-pill">#2</span> <span>Game B</span></div>
-              <div class="rank-row"><span class="rank-pill">#3</span> <span>Game C</span></div>
-              <div class="rank-row"><span class="rank-pill">#4</span> <span>Game D</span></div>
-              <div class="rank-row"><span class="rank-pill">#5</span> <span>Game E</span></div>
-            </div>
+          <div id="sidebarLastReviewLoading" class="comment-snippet">
+            Cargando…
           </div>
 
         </div>
-      </aside>
+      </div>
+
+      <!-- Últimos comentarios (GLOBAL) -->
+      <div class="home-panel mb-3" id="sidebarLastCommentsPanel">
+        <div class="home-panel__head">
+          <div>
+            <div class="home-panel__title">Last Comments</div>
+            <div class="home-panel__sub">Global (en vivo)</div>
+          </div>
+          <i class="bx bxs-message-rounded-dots"></i>
+        </div>
+
+        <div class="home-panel__body">
+
+          <div id="sidebarLastComments"></div>
+
+          <div id="sidebarLastCommentsEmpty" class="comment-snippet" style="display:none;">
+            No hay comentarios todavía.
+          </div>
+
+          <div id="sidebarLastCommentsLoading" class="comment-snippet">
+            Cargando…
+          </div>
+
+        </div>
+      </div>
 
     </div>
-  </div>
+  </aside>
+
 </main>
 
-<!-- MODAL (añadido, no rompe nada) -->
+<!-- MODAL  -->
 <div class="game-modal" id="gameModal" aria-hidden="true">
   <div class="game-modal__backdrop" data-close></div>
 
   <div class="game-modal__panel" role="dialog" aria-modal="true" aria-label="Game details">
     <button class="modal-close" type="button" aria-label="Close" data-close>X</button>
+
     <div class="game-modal__content">
+
+      <!-- LEFT: COVER -->
       <div class="game-modal__cover">
         <img id="modalCover" alt="">
         <div id="modalCoverFallback" class="cover-fallback" style="display:none;">No cover</div>
       </div>
 
+      <!-- CENTER: INFO  -->
       <div class="game-modal__info">
         <h2 id="modalTitle" class="game-modal__title"></h2>
 
@@ -244,16 +201,66 @@
           <div class="game-modal__fact"><span>Publishers:</span> <strong id="modalPublishers"></strong></div>
         </div>
 
-        <div class="game-modal__section">
-          <h4>Platforms</h4>
-          <div id="modalPlatforms" class="game-modal__pills "></div>
+        <div class="game-modal__duo">
+          <div class="game-modal__section">
+            <h4>Platforms</h4>
+            <div id="modalPlatforms" class="game-modal__pills "></div>
+          </div>
+
+          <div class="game-modal__section">
+            <h4>Genres</h4>
+            <div id="modalGenres" class="game-modal__pills"></div>
+          </div>
         </div>
 
-        <div class="game-modal__section">
-          <h4>Genres</h4>
-          <div id="modalGenres" class="game-modal__pills"></div>
+        <div class="game-modal__section game-modal__review">
+          <h4>Your review</h4>
+
+          <div id="reviewMsg" class="review-msg" style="display:none;"></div>
+
+          <div class="rating-stars" id="ratingStars" aria-label="Your rating">
+            <input type="radio" id="rate5" name="user_rating" value="5"><label for="rate5" title="5">★</label>
+            <input type="radio" id="rate4" name="user_rating" value="4"><label for="rate4" title="4">★</label>
+            <input type="radio" id="rate3" name="user_rating" value="3"><label for="rate3" title="3">★</label>
+            <input type="radio" id="rate2" name="user_rating" value="2"><label for="rate2" title="2">★</label>
+            <input type="radio" id="rate1" name="user_rating" value="1"><label for="rate1" title="1">★</label>
+            <input type="radio" id="rate0" name="user_rating" value="0"><label for="rate0" title="0">✕</label>
+          </div>
+
+          <label class="review-label" for="reviewComment">Comment (optional)</label>
+          <textarea id="reviewComment" class="review-textarea" rows="3"
+                    placeholder="Write a short comment…"></textarea>
+
+          <div class="review-actions">
+            <button type="button" class="boss-btn boss-btn--primary" id="btnSaveReview">
+              Save review
+            </button>
+            <button type="button" class="boss-btn boss-btn--ghost" id="btnClearReview">
+              Clear
+            </button>
+          </div>
+
+          <input type="hidden" id="reviewGameId" value="">
         </div>
       </div>
+      <!--RIGHT: LAST COMMENTS -->
+      <aside class="game-modal__last-comments" aria-label="Latest comments">
+        <div class="last-comments__head">
+          <h4 class="last-comments__title">Latest comments</h4>
+
+          <!-- contador dinámico -->
+          <span class="last-comments__badge" id="lastCommentsCount">0</span>
+        </div>
+
+        <div class="last-comments__list" id="lastCommentsList" role="list">
+      
+          <div class="last-comments__empty" id="lastCommentsEmpty">
+            No comments yet.
+          </div>
+        </div>
+      </aside>
+
+
     </div>
   </div>
 </div>
