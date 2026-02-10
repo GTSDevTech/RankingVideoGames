@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+
+
+  // =========================
+  // CARDS expand/collapse
+  // =========================
   const cards = Array.from(document.querySelectorAll(".boss-card"));
   if (cards.length) {
     const expanders = document.querySelectorAll(".js-expander");
@@ -87,8 +92,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryForm = document.getElementById("categoryForm");
   const categorySubmitBtn = document.getElementById("categorySubmitBtn");
 
-  // Guardamos el action de CREATE para poder volver a él siempre
   const CREATE_ACTION = categoryForm ? categoryForm.getAttribute("action") : "";
+  const EDIT_ACTION_TEMPLATE = categoryForm?.dataset.editActionTemplate || "/boss/categories/__CODE__/edit/";
+  const GAMES_SEARCH_URL = categoryForm?.dataset.gamesSearchUrl || "/boss/games/search/";
+
   let isEditMode = false;
 
   function openModal() {
@@ -101,7 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // refrescar render (por si había estado anterior)
     applyBrandFilter(currentBrand);
     applyPlatformSearch(platformSearchInput?.value || "");
-    applyGameFilters();
+
+    // ✅ A: siempre por API. En apertura, solo si hay filtros.
+    requestGamesRefresh(true);
   }
 
   function closeModal() {
@@ -110,11 +119,10 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.setAttribute("aria-hidden", "true");
     document.documentElement.style.overflow = "";
 
-    // ✅ FIX: al cerrar, vuelve a modo CREATE para que no "se quede en edit"
     if (isEditMode) resetCategoryModalToCreate();
   }
 
-  // ========= reset completo a CREATE (sin cargarte nada de tu lógica) =========
+  // ========= reset completo a CREATE =========
   function resetCategoryModalToCreate() {
     isEditMode = false;
 
@@ -134,9 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (nameInput) nameInput.value = "";
     if (descInput) descInput.value = "";
 
-    const minVotesInput = document.querySelector('#categoryForm input[name="min_votes"]');
-    const poolLimitInput = document.querySelector('#categoryForm input[name="pool_limit"]');
-    const sortByInput = document.querySelector('#categoryForm input[name="sort_by"]');
+    const minVotesInput = document.getElementById("minVotesInput") || document.querySelector('#categoryForm input[name="min_votes"]');
+    const poolLimitInput = document.getElementById("poolLimitInput") || document.querySelector('#categoryForm input[name="pool_limit"]');
+    const sortByInput = document.getElementById("sortByInput") || document.querySelector('#categoryForm input[name="sort_by"]');
 
     if (minVotesInput) minVotesInput.value = "0";
     if (poolLimitInput) poolLimitInput.value = "200";
@@ -156,9 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setChipVisual(chip, false);
     });
 
-    // limpiar visual juegos
-    document.querySelectorAll(".boss-game.is-selected").forEach(b => b.classList.remove("is-selected"));
-
     // limpiar searches
     if (platformSearchInput) platformSearchInput.value = "";
     if (gameSearchInput) gameSearchInput.value = "";
@@ -168,7 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
     syncGames();
     applyBrandFilter(currentBrand);
     applyPlatformSearch("");
-    applyGameFilters();
+
+    // ✅ A: grid vacío
+    clearGamesGrid();
+    ensureLoadMoreBtn(false);
+    setGamesEmptyState("Select platforms/genres to load games.");
   }
 
   // Al abrir "Add Categories", SIEMPRE modo create
@@ -298,11 +307,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const already = selected.decades.has(String(decade));
     if (already) {
       clearDecadesSelection();
+      requestGamesRefresh(true);
       return;
     }
 
     selectOnlyDecade(decade);
     setYears(decade, decade + 9);
+    requestGamesRefresh(true);
   }
 
   function normalizeYearRange() {
@@ -329,8 +340,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  yearFromSelect?.addEventListener("change", () => { normalizeYearRange(); applyGameFilters(); });
-  yearToSelect?.addEventListener("change", () => { normalizeYearRange(); applyGameFilters(); });
+  yearFromSelect?.addEventListener("change", () => {
+    normalizeYearRange();
+    requestGamesRefresh(true);
+  });
+  yearToSelect?.addEventListener("change", () => {
+    normalizeYearRange();
+    requestGamesRefresh(true);
+  });
 
   // =========================
   // Delegación de chips (modal)
@@ -344,15 +361,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const group = btn.dataset.group;
       e.preventDefault();
 
-      if (group === "decades") handleDecadeClick(btn);
-      else toggleNormalChip(btn);
+      if (group === "decades") {
+        handleDecadeClick(btn);
+        return;
+      }
 
-      // refrescos
+      toggleNormalChip(btn);
+
       if (group === "platforms") {
         applyBrandFilter(currentBrand);
         applyPlatformSearch(platformSearchInput?.value || "");
       }
-      applyGameFilters();
+
+      // ✅ cada cambio => API
+      requestGamesRefresh(true);
     });
   }
 
@@ -460,7 +482,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =========================
-  // GAMES: filter + select
+  // GAMES: server search + select (A)
   // =========================
   const gameSearchInput = document.getElementById("gameSearchInput");
   const gameClearBtn = document.getElementById("gameClearBtn");
@@ -474,69 +496,230 @@ document.addEventListener("DOMContentLoaded", () => {
     if (gamesJson) gamesJson.value = JSON.stringify(Array.from(selectedGames));
   }
 
-  // Regla: si NO hay plataformas ni géneros seleccionados => NO mostramos lista
   function hasAnyFilter() {
     return selected.platforms.size > 0 || selected.genres.size > 0;
   }
 
-  function matchesFilters(btn) {
-    const id = String(btn.dataset.id || "");
-
-    // ✅ los seleccionados siempre visibles (aunque no cumplan filtros)
-    if (selectedGames.has(id)) return true;
-
-    if (!hasAnyFilter()) return false;
-
-    const plats = (btn.dataset.platforms || "").toLowerCase();
-    const gens = (btn.dataset.genres || "").toLowerCase();
-
-    // platforms OR
-    if (selected.platforms.size > 0) {
-      let ok = false;
-      selected.platforms.forEach(p => { if (plats.includes(String(p).toLowerCase())) ok = true; });
-      if (!ok) return false;
-    }
-
-    // genres OR
-    if (selected.genres.size > 0) {
-      let ok = false;
-      selected.genres.forEach(g => { if (gens.includes(String(g).toLowerCase())) ok = true; });
-      if (!ok) return false;
-    }
-
-    // search by name
-    const q = (gameSearchInput?.value || "").trim().toLowerCase();
-    if (q) {
-      const name = (btn.dataset.name || "").toLowerCase();
-      if (!name.includes(q)) return false;
-    }
-
-    return true;
+  // ---------- Render helpers ----------
+  function clearGamesGrid() {
+    if (!gameGrid) return;
+    gameGrid.innerHTML = "";
   }
 
-  function applyGameFilters() {
+  function setGamesEmptyState(text) {
+    if (!gameEmpty) return;
+    gameEmpty.style.display = "";
+    gameEmpty.textContent = text || "No games match your filters.";
+  }
+
+  function hideGamesEmptyState() {
+    if (!gameEmpty) return;
+    gameEmpty.style.display = "none";
+  }
+
+  function buildGameButton(item) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "boss-game";
+    btn.dataset.id = item.id || "";
+    btn.dataset.name = item.name || "";
+
+    if (selectedGames.has(String(item.id))) btn.classList.add("is-selected");
+
+    const coverWrap = document.createElement("div");
+    coverWrap.className = "boss-game__cover";
+
+    if (item.coverUrl) {
+      const img = document.createElement("img");
+      img.src = item.coverUrl;
+      img.alt = item.name || "";
+      coverWrap.appendChild(img);
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "boss-game__cover--empty";
+      empty.textContent = "No image";
+      coverWrap.appendChild(empty);
+    }
+
+    const info = document.createElement("div");
+    info.className = "boss-game__info";
+    const name = document.createElement("span");
+    name.className = "boss-game__name";
+    name.textContent = item.name || "";
+    info.appendChild(name);
+
+    btn.appendChild(coverWrap);
+    btn.appendChild(info);
+    return btn;
+  }
+
+  // ---------- Pagination UI ----------
+  let currentPage = 1;
+  let pageSize = 60;
+  let hasMore = false;
+
+  function ensureLoadMoreBtn(show) {
     if (!gameGrid) return;
 
-    let visibleCount = 0;
-    const buttons = gameGrid.querySelectorAll(".boss-game");
+    let wrap = document.getElementById("bossLoadMoreWrap");
+    if (!wrap) {
+      wrap = document.createElement("div");
+      wrap.id = "bossLoadMoreWrap";
+      wrap.style.display = "none";
+      wrap.style.marginTop = "10px";
+      wrap.style.textAlign = "center";
 
-    buttons.forEach(btn => {
-      const show = matchesFilters(btn);
-      btn.style.display = show ? "" : "none";
-      if (show) visibleCount++;
-    });
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "bossLoadMoreBtn";
+      btn.className = "boss-btn boss-btn--ghost";
+      btn.textContent = "Load more";
+      btn.addEventListener("click", () => {
+        if (hasMore) fetchGames({ resetPage: false });
+      });
 
-    // empty message
-    if (gameEmpty) {
-      if (!hasAnyFilter() && selectedGames.size === 0) {
-        gameEmpty.style.display = "";
-        gameEmpty.textContent = "Select platforms/genres to load games.";
-      } else if (visibleCount === 0) {
-        gameEmpty.style.display = "";
-        gameEmpty.textContent = "No games match your filters.";
+      wrap.appendChild(btn);
+
+      // Insertar después del grid
+      gameGrid.parentElement?.appendChild(wrap);
+    }
+
+    wrap.style.display = show ? "" : "none";
+  }
+
+  function setLoadMoreLoading(isLoading) {
+    const btn = document.getElementById("bossLoadMoreBtn");
+    if (!btn) return;
+    btn.disabled = !!isLoading;
+    btn.textContent = isLoading ? "Loading..." : "Load more";
+  }
+
+  // ---------- Debounce + Abort ----------
+  let fetchTimer = null;
+  let activeController = null;
+
+  function requestGamesRefresh(resetPage) {
+    if (!modal?.classList.contains("is-open")) return;
+
+    window.clearTimeout(fetchTimer);
+    fetchTimer = window.setTimeout(() => {
+      fetchGames({ resetPage });
+    }, 200);
+  }
+
+  function getQueryParamsForGames(page, size) {
+    const params = new URLSearchParams();
+
+    const q = (gameSearchInput?.value || "").trim();
+    if (q) params.set("q", q);
+
+    params.set("platforms_any_json", JSON.stringify(Array.from(selected.platforms)));
+    params.set("genres_any_json", JSON.stringify(Array.from(selected.genres)));
+
+    const yFrom = (yearFromSelect?.value || "").trim();
+    const yTo = (yearToSelect?.value || "").trim();
+    if (yFrom) params.set("year_from", yFrom);
+    if (yTo) params.set("year_to", yTo);
+
+    params.set("page", String(page));
+    params.set("page_size", String(size));
+
+    return params;
+  }
+
+  async function fetchGames({ resetPage }) {
+    if (!gameGrid) return;
+
+    // ✅ A: sin filtros => grid vacío
+    if (!hasAnyFilter()) {
+      clearGamesGrid();
+      ensureLoadMoreBtn(false);
+
+      if (selectedGames.size === 0) {
+        setGamesEmptyState("Select platforms/genres to load games.");
       } else {
-        gameEmpty.style.display = "none";
+        setGamesEmptyState("Selected games are kept. Choose platforms/genres to search more games.");
       }
+      return;
+    }
+
+    if (resetPage) {
+      currentPage = 1;
+      clearGamesGrid();
+      ensureLoadMoreBtn(false);
+    }
+
+    if (activeController) activeController.abort();
+    activeController = new AbortController();
+
+    const params = getQueryParamsForGames(currentPage, pageSize);
+    const url = `${GAMES_SEARCH_URL}?${params.toString()}`;
+
+    if (resetPage) {
+      setGamesEmptyState("Loading games...");
+    } else {
+      setLoadMoreLoading(true);
+    }
+
+    try {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        signal: activeController.signal,
+      });
+
+      if (!res.ok) {
+        clearGamesGrid();
+        ensureLoadMoreBtn(false);
+        setGamesEmptyState("Error loading games.");
+        return;
+      }
+
+      const data = await res.json();
+      const items = Array.isArray(data.items) ? data.items : [];
+      hasMore = !!data.has_more;
+
+      // Orden: seleccionados primero (si aparecen en la página)
+      const seen = new Set();
+      const selectedFirst = [];
+      const rest = [];
+
+      for (const it of items) {
+        const id = String(it.id || "");
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+
+        if (selectedGames.has(id)) selectedFirst.push(it);
+        else rest.push(it);
+      }
+
+      const finalList = selectedFirst.concat(rest);
+
+      if (finalList.length === 0) {
+        clearGamesGrid();
+        ensureLoadMoreBtn(false);
+        setGamesEmptyState("No games match your filters.");
+        return;
+      }
+
+      hideGamesEmptyState();
+
+      const frag = document.createDocumentFragment();
+      finalList.forEach(it => frag.appendChild(buildGameButton(it)));
+      gameGrid.appendChild(frag);
+
+      ensureLoadMoreBtn(hasMore);
+      setLoadMoreLoading(false);
+
+      // avanzar página
+      if (resetPage) currentPage = 2;
+      else currentPage += 1;
+
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+      clearGamesGrid();
+      ensureLoadMoreBtn(false);
+      setGamesEmptyState("Error loading games.");
     }
   }
 
@@ -555,92 +738,86 @@ document.addEventListener("DOMContentLoaded", () => {
     else selectedGames.delete(String(id));
 
     syncGames();
-    applyGameFilters(); // para mantener visibles seleccionados
   });
 
-  gameSearchInput?.addEventListener("input", applyGameFilters);
+  gameSearchInput?.addEventListener("input", () => requestGamesRefresh(true));
   gameClearBtn?.addEventListener("click", () => {
     if (gameSearchInput) gameSearchInput.value = "";
-    applyGameFilters();
+    requestGamesRefresh(true);
   });
 
-  // init
+  // init A
   syncHidden();
   syncGames();
   applyBrandFilter(currentBrand);
   applyPlatformSearch("");
-  applyGameFilters();
 
-  /// =========================
-// EDIT CATEGORY (modo profe: cargar games[] y marcar seleccionados)
-// =========================
-document.querySelectorAll(".js-edit-category").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const card = btn.closest(".boss-cat-card");
-    if (!card) return;
+  clearGamesGrid();
+  ensureLoadMoreBtn(false);
+  setGamesEmptyState("Select platforms/genres to load games.");
 
-    const code = card.dataset.code;
+  // =========================
+  // EDIT CATEGORY
+  // =========================
+  document.querySelectorAll(".js-edit-category").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const card = btn.closest(".boss-cat-card");
+      if (!card) return;
 
-    // inputs básicos
-    document.getElementById("categoryCode").value = code;
-    document.querySelector('#categoryForm input[name="name"]').value = card.dataset.name || "";
-    document.querySelector('#categoryForm textarea[name="description"]').value = card.dataset.description || "";
+      const code = card.dataset.code;
 
-    const poolInput = document.querySelector('#categoryForm input[name="pool_limit"]');
-    const sortInput = document.querySelector('#categoryForm input[name="sort_by"]');
-    if (poolInput) poolInput.value = card.dataset.pool || 200;
-    if (sortInput) sortInput.value = card.dataset.sort || "popular";
+      // inputs básicos
+      document.getElementById("categoryCode").value = code;
+      document.querySelector('#categoryForm input[name="name"]').value = card.dataset.name || "";
+      document.querySelector('#categoryForm textarea[name="description"]').value = card.dataset.description || "";
 
-    // reset selecciones
-    selected.platforms.clear();
-    selected.genres.clear();
-    selected.decades.clear();
-    selectedGames.clear();
+      const poolInput = document.getElementById("poolLimitInput") || document.querySelector('#categoryForm input[name="pool_limit"]');
+      const sortInput = document.getElementById("sortByInput") || document.querySelector('#categoryForm input[name="sort_by"]');
+      if (poolInput) poolInput.value = card.dataset.pool || 200;
+      if (sortInput) sortInput.value = card.dataset.sort || "popular";
 
-    // limpiar visual de juegos
-    document.querySelectorAll(".boss-game.is-selected").forEach(b => b.classList.remove("is-selected"));
+      // reset selecciones
+      selected.platforms.clear();
+      selected.genres.clear();
+      selected.decades.clear();
+      selectedGames.clear();
 
+      try {
+        const gamesArr = JSON.parse(card.dataset.games || "[]");
+        gamesArr.forEach(id => selectedGames.add(String(id)));
+      } catch (e) {
+        console.warn("Invalid data-games", e, card.dataset.games);
+      }
 
-    try {
-      const gamesArr = JSON.parse(card.dataset.games || "[]"); // <-- data-games='[...]'
-      gamesArr.forEach(id => selectedGames.add(String(id)));
-    } catch (e) {
-      console.warn("Invalid data-games", e, card.dataset.games);
-    }
+      if (yearFromSelect) yearFromSelect.value = "";
+      if (yearToSelect) yearToSelect.value = "";
 
-    // years (si en modo profe no los usas, déjalos vacíos)
-    if (yearFromSelect) yearFromSelect.value = "";
-    if (yearToSelect) yearToSelect.value = "";
+      syncHidden();
+      syncGames();
 
-    // sync hidden inputs
-    syncHidden(); // (aunque no uses platforms/genres ahora, no molesta)
-    syncGames();  // <-- mete selectedGames en #gamesJson
+      document.querySelectorAll(".boss-chip[data-group][data-value]").forEach(chip => {
+        setChipVisual(chip, false);
+      });
 
-    // chips visualmente a OFF (modo profe)
-    document.querySelectorAll(".boss-chip[data-group][data-value]").forEach(chip => {
-      setChipVisual(chip, false);
+      // ✅ A: en edit también grid vacío hasta que filtres
+      clearGamesGrid();
+      ensureLoadMoreBtn(false);
+      if (selectedGames.size > 0) {
+        setGamesEmptyState("Selected games are kept. Choose platforms/genres to search more games.");
+      } else {
+        setGamesEmptyState("Select platforms/genres to load games.");
+      }
+
+      if (categoryForm) {
+        const tpl = EDIT_ACTION_TEMPLATE || "/boss/categories/__CODE__/edit/";
+        categoryForm.action = tpl.replace("__CODE__", String(code));
+      }
+      if (categorySubmitBtn) categorySubmitBtn.textContent = "Update Category";
+
+      isEditMode = true;
+      openModal();
     });
-
-    // marcar juegos visualmente (solo los que existan en DOM)
-    document.querySelectorAll(".boss-game").forEach(b => {
-      const id = b.dataset.id;
-      if (!id) return;
-      b.classList.toggle("is-selected", selectedGames.has(String(id)));
-    });
-
-    // refrescar preview para que se vean los seleccionados aunque no haya filtros
-    applyBrandFilter(currentBrand);
-    applyPlatformSearch("");
-    applyGameFilters();
-
-    // cambiar acción del form a EDIT
-    if (categoryForm) categoryForm.action = `/boss/categories/${code}/edit/`;
-    if (categorySubmitBtn) categorySubmitBtn.textContent = "Update Category";
-
-    isEditMode = true;
-    openModal();
   });
-});
 
   // =========================
   // DELETE
@@ -659,8 +836,8 @@ document.querySelectorAll(".js-edit-category").forEach(btn => {
       form.method = "POST";
       form.action = `/boss/categories/${code}/delete/`;
 
-      const csrf = document.querySelector("[name=csrfmiddlewaretoken]").cloneNode();
-      form.appendChild(csrf);
+      const csrf = document.querySelector("[name=csrfmiddlewaretoken]")?.cloneNode();
+      if (csrf) form.appendChild(csrf);
 
       document.body.appendChild(form);
       form.submit();
@@ -668,3 +845,4 @@ document.querySelectorAll(".js-edit-category").forEach(btn => {
   });
 
 });
+

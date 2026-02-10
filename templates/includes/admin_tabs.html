@@ -1,0 +1,29 @@
+{% load static %}
+
+
+<div class="admin-tabs" data-admin-tabs>
+  <div class="admin-tabs__inner">
+    <a href="{% url 'go_admin' %}"
+       class="admin-tab {% if request.resolver_match.url_name == 'go_admin' %}is-active{% endif %}"
+       data-tab="users"
+       aria-current="{% if request.resolver_match.url_name == 'go_admin' %}page{% endif %}">
+      <i class="fa-solid fa-users"></i>
+      <span>Users</span>
+    </a>
+
+    <a href="{% url 'go_admin_stats' %}?category={{ category_code|default:1 }}"
+       class="admin-tab {% if request.resolver_match.url_name == 'go_admin_stats' %}is-active{% endif %}"
+       data-tab="stats">
+      <i class="fa-solid fa-chart-column"></i>
+      <span>Stats</span>
+    </a>
+
+    <!-- Deja otros para futuro -->
+    <button type="button" class="admin-tab is-disabled" disabled>
+      <i class="fa-solid fa-gear"></i>
+      <span>Settings</span>
+    </button>
+
+    <span class="admin-tab-indicator" aria-hidden="true"></span>
+  </div>
+</div>

@@ -31,6 +31,15 @@ body.bg-ranking{
     align-items: center;
 }
 
+.subcontainer-ranking{
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  
+}
+
 .main-row-rk-panel{
   width: 100% !important;
   max-height: 80vh !important;
@@ -134,17 +143,221 @@ body.bg-ranking{
 
 }
 
+.boss-wrapper{
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.boss-cat-wrapper{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 
 
+.boss-cat-wrapper{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Grid de categorías */
+.boss-cat-grid{
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+  margin: 1rem;
+}
+
+/* Card */
+.boss-cat-card{
+  position: relative;
+  overflow: hidden;
+
+  background-color: rgba(15, 12, 41, 0.82) !important;
+
+  border: 1px solid rgba(168, 85, 247, 0.28);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 0 16px rgba(0,0,0,.45);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+
+  background-size: cover !important;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+}
+
+.boss-cat-card > *{
+  position: relative;
+  z-index: 1;
+}
 
 
+.boss-cat-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.38)) !important;
+  pointer-events:none;
+  z-index:0;
+}
+.boss-cat-card > *{ position:relative; z-index:1; }
 
 
+/* Top row */
+.boss-cat-card__top{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.boss-cat-pill{
+  padding: .25rem .6rem !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  background: rgba(168,85,247,0.80) !important;
+  border: 1px solid rgba(168,85,247,0.80) !important;
+  color: #e5e7eb;
+  white-space: nowrap;
+}
+
+.boss-cat-name{
+  color: #fff;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Body */
+.boss-cat-desc{
+  color: rgba(229,231,235,.72);
+  font-size: .92rem;
+  min-height: 42px;
+}
+
+.boss-cat-meta{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.boss-cat-chip{
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 900;
+  background: rgba(2, 54, 129, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.80);
+  color: rgba(229,231,235,.92);
+}
+
+.boss-cat-chip--alt{
+  background: rgba(124, 58, 237, 0.85);
+  border: 1px solid rgba(168, 85, 247, 0.80);
+}
 
 
+.boss-section{
+  border-radius: 18px;
+  border: 1px solid rgba(168, 85, 247, 0.20);
+  background: rgba(15, 12, 41, 0.55);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+  padding: 18px;
+}
+
+.boss-section__head{
+  display:flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.boss-section__title{
+  margin: 0;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: .06em;
+  font-weight: 900;
+}
+
+.boss-section__sub{
+  margin: 6px 0 0;
+  color: rgba(229,231,235,.70);
+  font-weight: 600;
+  font-size: .95rem;
+}
 
 
+.boss-cat-card.is-ranked{
+  border: 3px solid rgba(46,226,255,.75) !important;
+  box-shadow: 0 0 0 2px rgba(46,226,255,.16), 0 18px 38px rgba(0,0,0,.35);
+}
 
+/* badge arriba derecha */
+.boss-cat-badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background: rgba(0,0,0,.55);
+  border: 3px solid rgba(46,226,255,.35) ;
+  backdrop-filter: blur(6px);
+
+  opacity:0;
+  transform: scale(.96);
+  transition: opacity .16s ease, transform .16s ease;
+  z-index:2;
+}
+.boss-cat-badge i{
+  font-size: 20px;
+  color: rgba(46,226,255,.95);
+}
+.boss-cat-card.is-ranked .boss-cat-badge{
+  opacity:1;
+  transform: scale(1);
+}
+
+
+.home-panel__body{
+  max-height: 50vh;      
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.rank-row{
+  align-items: center;
+}
+
+.rank-mini-cover{
+  width: 26px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(56,189,248,0.18);
+}
+
+.rank-mini-name{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
 
 
 

@@ -1,0 +1,86 @@
+.admin-tabs{
+  position: sticky;
+  top: 92px; /* ajusta a tu navbar real */
+  z-index: 500;
+  padding: 14px 0;
+}
+
+.admin-tabs__inner{
+  width: min(780px, calc(100% - 40px));
+  margin: 0 auto;
+  height: 54px;
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  background: rgba(15, 12, 41, 0.62);
+  border: 1px solid rgba(168, 85, 247, 0.22);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+
+  position: relative;
+  padding: 8px;
+}
+
+.admin-tab{
+  position: relative;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  color: rgba(229,231,235,.88);
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: .02em;
+
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition: transform .12s ease, color .12s ease;
+}
+
+.admin-tab i{ font-size: 16px; }
+
+.admin-tab:hover{
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.admin-tab.is-disabled{
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.admin-tab-indicator{
+  position: absolute;
+  inset: 8px auto 8px 8px;
+  width: 0px;
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, rgba(46,226,255,.85), rgba(168,85,247,.75));
+  box-shadow: 0 0 0 2px rgba(46,226,255,.12), 0 14px 30px rgba(0,0,0,.35);
+
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), width .28s cubic-bezier(.2,.9,.2,1);
+  z-index: 0;
+}
+
+.admin-tab.is-active{
+  color: #0b1020;
+}
+
+.admin-tab.is-active,
+.admin-tab.is-active *{
+  position: relative;
+  z-index: 1;
+}

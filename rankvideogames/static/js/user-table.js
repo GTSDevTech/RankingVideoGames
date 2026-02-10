@@ -36,7 +36,40 @@
   });
 
   search?.addEventListener("input", applyFilters);
-
-  // primera pasada
   applyFilters();
+})();
+
+
+(() => {
+  const root = document.querySelector("[data-admin-tabs]");
+  if (!root) return;
+
+  const inner = root.querySelector(".admin-tabs__inner");
+  const indicator = root.querySelector(".admin-tab-indicator");
+  const active = root.querySelector(".admin-tab.is-active");
+
+  function placeIndicator(el){
+    if (!el || !indicator || !inner) return;
+    const r = el.getBoundingClientRect();
+    const p = inner.getBoundingClientRect();
+
+    indicator.style.width = `${r.width}px`;
+    indicator.style.transform = `translateX(${r.left - p.left}px)`;
+  }
+
+  placeIndicator(active);
+
+  window.addEventListener("resize", () => {
+    placeIndicator(root.querySelector(".admin-tab.is-active"));
+  });
+
+  inner.addEventListener("mouseover", (e) => {
+    const el = e.target.closest(".admin-tab");
+    if (!el || el.classList.contains("is-disabled")) return;
+    placeIndicator(el);
+  });
+
+  inner.addEventListener("mouseleave", () => {
+    placeIndicator(root.querySelector(".admin-tab.is-active"));
+  });
 })();

@@ -129,3 +129,4 @@ class Ranking(models.Model):
         managed = False
 
 
+

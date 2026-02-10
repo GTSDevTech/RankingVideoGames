@@ -4,6 +4,9 @@
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/ranking.css' %}">
+{% endblock %}
 
 {% block body_class %}bg-ranking{% endblock %}
 
@@ -20,7 +23,7 @@
         <div class="games-header__sub">Created your Ranking (click to build your Top 5)</div>
       </div>
   </div>
-  <div class="container p-5 min-vw-100">
+  <div class="subcontainer-ranking p-5 min-vw-100">
     <section class="boss-wrapper">
 
       <!-- GRID CATEGORIES -->
@@ -35,11 +38,17 @@
         <div class="boss-cat-wrapper">
           <div class="boss-cat-grid">
             {% for c in categories %}
-              <article class="boss-cat-card"
+              <article class="boss-cat-card {% if c.is_ranked %}is-ranked{% endif %}"
                 data-code="{{ c.code }}"
+                data-ranked="{% if c.is_ranked %}1{% else %}0{% endif %}"
                 data-name="{{ c.name|escape }}"
                 data-description="{{ c.description|escape }}"
                 data-games='{{ c.games|default:"[]"|safe }}'>
+
+
+                <span class="boss-cat-badge" title="Ranking creado" aria-hidden="true">
+                  <i class="bx bxs-badge-check"></i>
+                </span>
 
                 <div class="boss-cat-card__top">
                   <span class="boss-cat-pill">#{{ c.code }}</span>
@@ -92,14 +101,20 @@
                     </div>
                   </div>
 
-                  <div class="rank-card-mini__body">
-                    {% for game_id in rk.top5 %}
-                      <div class="rank-row">
-                        <span class="rank-pill">#{{ forloop.counter }}</span>
-                        <span>Game {{ game_id }}</span>
-                      </div>
-                    {% endfor %}
-                  </div>
+                <div class="rank-card-mini__body">
+                  {% for g in rk.top5_items %}
+                    <div class="rank-row">
+                      <span class="rank-pill">#{{ forloop.counter }}</span>
+
+                      {% if g.cover %}
+                        <img class="rank-mini-cover" src="{{ g.cover }}" alt="">
+                      {% endif %}
+
+                      <span class="rank-mini-name" title="{{ g.name }}">{{ g.name }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+
 
                 </div>
               {% endfor %}

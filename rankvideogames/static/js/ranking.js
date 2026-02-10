@@ -7,6 +7,52 @@ const state = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+
+
+  // =========================
+  // CATEGORY CARD BACKGROUNDS
+  // =========================
+  const CAT_BG_IMAGES = [
+    "/static/img/cat_01.jpg",
+    "/static/img/cat_02.jpg",
+    "/static/img/cat_03.jpg",
+    "/static/img/cat_04.jpg",
+    "/static/img/cat_05.jpg",
+    "/static/img/cat_06.jpg",
+    "/static/img/cat_07.jpg",
+  ];
+
+  function pickDeterministicBg(code, arr) {
+    const s = String(code ?? "");
+    // hash simple (estable)
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    const idx = Math.abs(h) % arr.length;
+    return arr[idx];
+  }
+
+  function applyCategoryCardBackgrounds() {
+    const cards = document.querySelectorAll(".boss-cat-card");
+    if (!cards.length || !CAT_BG_IMAGES.length) return;
+
+    cards.forEach((card) => {
+      const code = card.dataset.code;
+      const url = pickDeterministicBg(code, CAT_BG_IMAGES);
+
+      // evita reescribir si ya está aplicado
+      if (card.dataset.bgApplied === "1") return;
+
+      card.style.backgroundImage = `url("${url}")`;
+      card.dataset.bgApplied = "1";
+    });
+  }
+
+  applyCategoryCardBackgrounds();
+
+
+
+
+
   const wrap = document.getElementById("rankingBuilderWrap");
 
   const rankingNameInput = document.getElementById("rankingNameInput");
@@ -396,6 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (poolGrid) poolGrid.innerHTML = `<div class="text-white-50">Error cargando listado.</div>`;
       });
   }
+  
 
   document.querySelectorAll(".boss-cat-card").forEach((card) => {
     card.addEventListener("click", (e) => {

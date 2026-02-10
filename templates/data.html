@@ -4,6 +4,9 @@
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/data.css' %}">
+{% endblock %}
 
 {% block title %}Boss Panel{% endblock %}
 
@@ -171,7 +174,6 @@
   <div class="boss-modal__panel" role="dialog" aria-modal="true">
     <button class="boss-modal__close" type="button" data-close aria-label="Cerrar">×</button>
 
-    <!-- (opcional pero muy útil) títulos con ids para que el JS cambie Create/Edit -->
     <h3 class="boss-modal__title" id="modalTitle">Create Category</h3>
     <p class="boss-modal__sub" id="modalSub">Define rules for a ranking category</p>
 
@@ -180,11 +182,11 @@
           method="post"
           action="{% url 'create_news_categories' %}"
           data-create-action="{% url 'create_news_categories' %}"
-          data-edit-action-template="/boss/categories/__CODE__/edit/">
+          data-edit-action-template="/boss/categories/__CODE__/edit/"
+          data-games-search-url="{% url 'boss_games_search_api' %}">
       {% csrf_token %}
 
       <!-- Hidden payloads -->
-
       <input type="hidden" name="games" id="gamesJson" value="[]">
       <input type="hidden" name="platforms_any_json" id="platformsJson" value="[]">
       <input type="hidden" name="genres_any_json" id="genresJson" value="[]">
@@ -381,30 +383,7 @@
                 Select platforms/genres to load games.
               </div>
 
-              <div class="boss-preview__grid" id="gamePreviewGrid">
-                {% for vg in preview_games %}
-                  <button
-                    type="button"
-                    class="boss-game"
-                    data-id="{{ vg.id }}"
-                    data-name="{{ vg.name|escape }}"
-                    data-platforms="{{ vg.platforms|default:''|escape }}"
-                    data-genres="{{ vg.genres|default:''|escape }}"
-                  >
-                    <div class="boss-game__cover">
-                      {% if vg.cover_url %}
-                        <img src="{{ vg.cover_url }}" alt="{{ vg.name }}">
-                      {% else %}
-                        <div class="boss-game__cover--empty">No image</div>
-                      {% endif %}
-                    </div>
-
-                    <div class="boss-game__info">
-                      <span class="boss-game__name">{{ vg.name }}</span>
-                    </div>
-                  </button>
-                {% endfor %}
-              </div>
+              <div class="boss-preview__grid" id="gamePreviewGrid"></div>
             </div>
 
             <small class="text-white-50 d-block mt-2">
@@ -428,7 +407,7 @@
   </div>
 </div>
 
-
 <script src="/static/js/data-cards.js"></script>
+
 
 {% endblock %}

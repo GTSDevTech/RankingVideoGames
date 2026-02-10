@@ -27,6 +27,8 @@ body.bg-user{
   background-attachment: fixed;
 }
 
+
+
 /* Igual que HOME: baja el contenido con top:160 */
 .user-content{
   position: relative;
@@ -187,12 +189,15 @@ body.bg-user{
 @media (max-width: 720px){
   .user-grid{ grid-template-columns: 1fr; }
 }
+
+
+
 /* card */
 .user-card{
-  position: relative;
-  /* isolation: isolate;  <-- QUITAR */
-  border-radius: 18px;
-  border: 1px solid rgba(168,85,247,.22);
+  position: relative !important;
+
+  border-radius: 18px !important;
+  border: 1px solid rgba(168,85,247,.22) !important;
   overflow: hidden;
   background: rgba(0,0,0,.22);
   padding: 14px;
@@ -207,16 +212,35 @@ body.bg-user{
   box-shadow: 0 0 18px rgba(46,226,255,.14), 0 0 18px rgba(168,85,247,.10);
 }
 
-/* fondo imagen */
 .user-card__bg{
-  position: absolute;
+  position: absolute !important;
   inset: 0;
-  z-index: 0; 
+  z-index: 0 !important;
   background: url('/static/img/switch_games.png') center / cover no-repeat !important;
   opacity: .35;
   filter: saturate(1.15) contrast(1.05);
   pointer-events: none;
 }
+
+.user-card::after{
+  content:"";
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important; 
+  background: linear-gradient(180deg,
+    rgba(15,12,41,.50) 0%,
+    rgba(15,12,41,.65) 55%,
+    rgba(2,54,129,.35) 100%) !important;
+}
+
+/* contenido encima de todo */
+.user-card__top,
+.user-card__meta,
+.user-card__footer{
+  position: relative !important;
+  z-index: 9999 !important;
+}
+
 
 /* overlay encima */
 
@@ -287,3 +311,6 @@ body.bg-user{
   color: rgba(229,231,235,.92);
   font-family: 'Orbitron', sans-serif;
 }
+
+
+

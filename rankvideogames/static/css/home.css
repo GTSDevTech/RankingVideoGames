@@ -14,10 +14,14 @@
 
 .game-hidden{ display:none !important; }
 
-html, body{
-  width: 100% !important;
-  height: 100% !important;
+html, body {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    font-family: 'Orbitron', 'Inter', sans-serif;
 }
+
+
 
 body.bg-home{
   min-height: 100vh !important;  
@@ -1002,7 +1006,7 @@ body.bg-home{
 }
 
 #gameModal .review-actions{
-  margin-top: 12px;
+  margin-top: 12px !important;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1138,4 +1142,36 @@ body.bg-home{
   #gameModal .game-modal__last-comments{
     min-height: 240px;
   }
+}
+
+
+/* botones */
+.boss-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  padding: .55rem 1rem;
+  font-weight: 900;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.boss-btn--primary{
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+  color: #0b1020;
+}
+
+.boss-btn--secondary{
+  background: linear-gradient(135deg, #d204c2, #ff2ed6);
+  color: #0b1020;
+}
+
+.boss-btn--ghost{
+  background: rgb(210, 4, 194, 0.7);
+  color: #e5e7eb;
+  border: 1px solid rgba(168,85,247,.35);
 }

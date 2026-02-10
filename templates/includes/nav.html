@@ -24,22 +24,22 @@
                 href="{% url 'go_home' %}">Games</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.resolver_match.url_name == 'go_users' %}active{% endif %}"
-                href="{% url 'go_users' %}">Users</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'go_admin' %}active{% endif %}"
+                href="{% url 'go_admin' %}">Admin Panel </a>
               </li>
           {% elif user.role == 2 %}
           <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'go_home' %}active{% endif %}"
                 href="{% url 'go_home' %}">Review</a>
           </li>
-                <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'go_review' %}active{% endif %}"
-            href="{% url 'go_review' %}">Statistics</a>
-          </li>
 
           <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'go_ranking' %}active{% endif %}"
               href="{% url 'go_ranking' %}">Rankings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'go_review' %}active{% endif %}"
+              href="{% url 'go_review' %}">Statistics</a>
           </li>
           {% endif %}
         {% endif %}

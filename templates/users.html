@@ -1,48 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load text_filters %}
-
-
 
 {% block nav %}
   {% include 'includes/nav.html' %}
+  {% include 'includes/admin_tabs.html' %}
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/users.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
 {% endblock %}
 
 {% block body_class %}bg-user{% endblock %}
 
 {% block body %}
-<style>
-.user-card__bg{
-  position: absolute !important;
-  inset: 0;
-  z-index: 0 !important;
-  background: url('/static/img/switch_games.png') center / cover no-repeat !important;
-  opacity: .35;
-  filter: saturate(1.15) contrast(1.05);
-  pointer-events: none;
-}
 
-.user-card::after{
-  content:"";
-  position: absolute;
-  inset: 0;
-  z-index: 1; 
-  background: linear-gradient(180deg,
-    rgba(15,12,41,.50) 0%,
-    rgba(15,12,41,.65) 55%,
-    rgba(2,54,129,.35) 100%);
-}
-
-/* contenido encima de todo */
-.user-card__top,
-.user-card__meta,
-.user-card__footer{
-  position: relative;
-  z-index: 2;
-}
-
-</style>
 <main class="user-content">
+  
   <div class="container-fluid px-5 user-panel-wrap">
+    
     <section class="user-panel">
 
       <div class="user-toolbar">

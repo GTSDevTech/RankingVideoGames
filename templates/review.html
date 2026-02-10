@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
-
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/review.css' %}">
+{% endblock %}
 {% block body_class %}bg-review{% endblock %}
 
 {% block body %}

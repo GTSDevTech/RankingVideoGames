@@ -256,3 +256,13 @@
 .navbar-toggler.collapsed {
   color: white !important;
 }
+
+@media (min-width: 992px) {
+  .links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    justify-content: space-around !important;
+  }
+}
