@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav %}
+  {% include 'includes/nav.html' %}
+
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/users.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_stats.css' %}">
+ 
+{% endblock %}
+
+{% block body_class %}bg-user{% endblock %}
+
+{% block body %}
+<main class="user-content">
+    {% include 'includes/admin_tabs.html' %}
+  <div class="container-fluid px-5 user-panel-wrap">
+    <section class="user-panel">
+
+      <div class="user-toolbar">
+        <div class="user-toolbar__left">
+          <span class="user-dot"></span>
+          <h2 class="user-title">Global Ranking</h2>
+        </div>
+
+        <div class="user-toolbar__right">
+         <form method="get">
+            <select name="limit" onchange="this.form.submit()">
+              {% for n in limit_options %}
+                <option value="{{ n }}" {% if n == limit %}selected{% endif %}>
+                  Top {{ n }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        {% for r in rows %}
+          <article class="stats-card">
+
+            {% if r.cover %}
+              <img class="stats-card__cover" src="{{ r.cover }}" alt="{{ r.name }}">
+            {% endif %}
+
+            <div class="stats-card__body">
+              <div class="stats-card__title">{{ r.name }}</div>
+
+              <div class="stats-meta">
+                <span class="stats-pill stats-pill--accent">🏆 {{ r.points }} pts</span>
+                <span class="stats-pill">👥 {{ r.appearances }} rankings</span>
+                <span class="stats-pill">⭐ Avg: {{ r.pos_avg }}</span>
+              </div>
+
+              <div class="stats-positions">
+                <span class="stats-pos">#1 · {{ r.pos_counts.1 }}</span>
+                <span class="stats-pos">#2 · {{ r.pos_counts.2 }}</span>
+                <span class="stats-pos">#3 · {{ r.pos_counts.3 }}</span>
+                <span class="stats-pos">#4 · {{ r.pos_counts.4 }}</span>
+                <span class="stats-pos">#5 · {{ r.pos_counts.5 }}</span>
+              </div>
+            </div>
+
+          </article>
+        {% empty %}
+          <div class="stats-empty">No hay rankings aún.</div>
+        {% endfor %}
+      </div>
+
+    </section>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,132 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* =========================
+   CARD
+   ========================= */
+.stats-card {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 18px;
+
+  background: rgba(15, 12, 41, 0.75);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 12px 28px rgba(0,0,0,.35);
+
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+}
+
+/* =========================
+   COVER
+   ========================= */
+.stats-card__cover {
+  width: 54px;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,.45);
+}
+
+/* =========================
+   BODY
+   ========================= */
+.stats-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.stats-card__title {
+  font-weight: 900;
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+/* =========================
+   META
+   ========================= */
+.stats-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stats-pill {
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 900;
+  background: rgba(2, 54, 129, 0.65);
+  border: 1px solid rgba(56,189,248,.22);
+  color: #e5e7eb;
+}
+
+.stats-pill--accent {
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+  color: #0b1020;
+}
+
+/* =========================
+   POSITIONS
+   ========================= */
+.stats-positions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  opacity: .85;
+}
+
+.stats-pos {
+  font-size: .72rem;
+  padding: .15rem .45rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #fff;
+}
+
+/* =========================
+   SELECT
+   ========================= */
+.stats-select {
+  background: rgba(15, 12, 41, 0.85);
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  font-weight: 700;
+}
+
+.stats-select:focus {
+  outline: none;
+  border-color: rgba(46,226,255,.9);
+}
+
+/* =========================
+   EMPTY
+   ========================= */
+.stats-empty {
+  color: rgba(229,231,235,.65);
+  padding: 24px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.stats-pill--accent {
+  box-shadow: 0 0 0 2px rgba(46,226,255,.14), 0 10px 22px rgba(0,0,0,.25);
+}

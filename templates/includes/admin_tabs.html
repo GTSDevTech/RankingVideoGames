@@ -12,18 +12,16 @@
     </a>
 
     <a href="{% url 'go_admin_stats' %}?category={{ category_code|default:1 }}"
-       class="admin-tab {% if request.resolver_match.url_name == 'go_admin_stats' %}is-active{% endif %}"
-       data-tab="stats">
+      class="admin-tab {% if request.resolver_match.url_name == 'go_admin_stats' %}is-active{% endif %}">
       <i class="fa-solid fa-chart-column"></i>
-      <span>Stats</span>
+      <span>Categories Stats</span>
     </a>
-
-    <!-- Deja otros para futuro -->
-    <button type="button" class="admin-tab is-disabled" disabled>
-      <i class="fa-solid fa-gear"></i>
-      <span>Settings</span>
-    </button>
-
+    <a href="{% url 'go_admin_global_ranking' %}"
+      class="admin-tab {% if request.resolver_match.url_name == 'go_admin_global_ranking' %}is-active{% endif %}"
+      data-tab="global">
+      <i class="fa-solid fa-ranking-star"></i>
+      <span>Global Games Stats</span>
+    </a>
     <span class="admin-tab-indicator" aria-hidden="true"></span>
   </div>
 </div>

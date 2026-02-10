@@ -2,6 +2,7 @@ from django.urls import path, include
 from rankvideogames.views import *
 
 
+
 urlpatterns = [
     path("", auth_view, name="go_login"),
     path("login/", auth_view, name="go_login"),
@@ -11,10 +12,11 @@ urlpatterns = [
     path("ranking/", go_ranking, name="go_ranking"),
     path("review/", go_statistics, name="go_review"),
     path("data/", go_data, name="go_data"),
-    path("users/", go_admin, name="go_admin"),
 
-    # Admin Stats (si lo quieres ya activo)
-    path("admin/stats/", go_admin_stats, name="go_admin_stats"),
+    # ADMIN
+    path("users/", go_admin, name="go_admin"),
+    path("users/stats/", go_admin_stats, name="go_admin_stats"),
+    path("users/global/", go_admin_global_ranking, name="go_admin_global_ranking"),
 
     # CSV
     path("boss/load-data/", load_data_movies, name="load_data_movies"),

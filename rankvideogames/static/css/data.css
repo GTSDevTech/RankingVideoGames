@@ -1,7 +1,20 @@
+:root{
+
+    --rk-blue: rgba(2, 54, 129, 0.55);
+  --rk-blue2: rgba(2, 43, 105, 0.55);
+  --rk-cyan: rgba(46, 226, 255, 0.16);
+  --rk-purple: rgba(168, 85, 247, 0.16);
+  --rk-pink: rgba(255, 46, 214, 0.14);
+  --rk-border: rgba(56, 189, 248, 0.22);
+  --rk-text: #e5e7eb;
+  --rk-muted: rgba(229,231,235,0.70);
+}  
+  
   html, body{
     height: 100%;
     width: 100%;
   }
+
 
   body.bg-boss{
     box-sizing: border-box;
@@ -931,3 +944,28 @@
   line-height: 1.2;
   text-align: center;
 }
+
+.rk-label{
+  color: var(--rk-text);
+  font-weight: 800;
+  font-size: .85rem;
+  margin-bottom: 6px;
+  display:block;
+}
+.rk-select{
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  color: var(--rk-text);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+.rk-select option{ color:#0b1020; }
+
+/* Reset button */
+.rk-btn-reset{
+  border-radius: 14px;
+  font-weight: 900;
+  border: none;
+  color: #0b1020;
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+}
+.rk-btn-reset:hover{ filter: brightness(1.05); }

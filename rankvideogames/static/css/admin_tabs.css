@@ -1,12 +1,12 @@
 .admin-tabs{
   position: sticky;
-  top: 92px; /* ajusta a tu navbar real */
+  top: 160px;
   z-index: 500;
   padding: 14px 0;
 }
 
 .admin-tabs__inner{
-  width: min(780px, calc(100% - 40px));
+  width: min(2200px, calc(100% - 1px));
   margin: 0 auto;
   height: 54px;
   border-radius: 18px;
@@ -83,4 +83,13 @@
 .admin-tab.is-active *{
   position: relative;
   z-index: 1;
+}
+.admin-tab-indicator{
+  pointer-events: none;   
+  z-index: 0;               
+}
+
+.admin-tab{
+  position: relative;
+  z-index: 1;             
 }

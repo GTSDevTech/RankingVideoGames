@@ -30,6 +30,7 @@ h1, h2, h3, h4, h5,
   justify-content: center;
   min-height: 100vh;
   width: 100%;
+  padding: 2rem 2rem 0 2rem;
   background-image: url("/static/img/login.png");
   background-repeat: no-repeat;
   background-size: cover;
@@ -52,6 +53,7 @@ h1, h2, h3, h4, h5,
   width: 100%;
   display: flex;
   justify-content: center;
+  max-height: 80vh !important;
 }
 
 .login-card{

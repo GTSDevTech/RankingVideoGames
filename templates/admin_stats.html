@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_stats.css' %}">
+  <link rel="stylesheet" href="{% static 'css/users.css' %}">
+{% endblock %}
+
+{% block body_class %}bg-user{% endblock %}
+
+{% block body %}
+<main class="user-content">
+    {% include 'includes/admin_tabs.html' %}
+  <div class="container-fluid px-5 user-panel-wrap">
+    <section class="user-panel">
+
+      <!-- Toolbar -->
+      <div class="user-toolbar">
+        <div class="user-toolbar__left">
+          <span class="user-dot"></span>
+          <h2 class="user-title">Ranking Stats</h2>
+        </div>
+
+        <div class="user-toolbar__right">
+          <form method="get" action="{% url 'go_admin_stats' %}">
+            <select class="stats-select" name="category" onchange="this.form.submit()">
+              {% for c in categories %}
+                <option value="{{ c.code }}" {% if c.code == category_code %}selected{% endif %}>
+                  #{{ c.code }} · {{ c.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="stats-grid">
+        {% for r in rows %}
+          <article class="stats-card">
+
+            {% if r.cover %}
+              <img class="stats-card__cover" src="{{ r.cover }}" alt="{{ r.name }}">
+            {% endif %}
+
+            <div class="stats-card__body">
+              <div class="stats-card__title">{{ r.name }}</div>
+
+              <div class="stats-meta">
+                <span class="stats-pill">🗳 {{ r.votes }} votes</span>
+                <span class="stats-pill stats-pill--accent">
+                  ⭐ Avg: {{ r.pos_avg }}
+                </span>
+              </div>
+
+              <div class="stats-positions">
+                {% for p, c in r.pos_counts.items %}
+                  <span class="stats-pos">#{{ p }} · {{ c }}</span>
+                {% endfor %}
+              </div>
+            </div>
+
+          </article>
+        {% empty %}
+          <div class="stats-empty">
+            No hay datos para esta categoría.
+          </div>
+        {% endfor %}
+      </div>
+
+    </section>
+  </div>
+</main>
+{% endblock %}

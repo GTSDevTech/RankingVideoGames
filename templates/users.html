@@ -4,7 +4,6 @@
 
 {% block nav %}
   {% include 'includes/nav.html' %}
-  {% include 'includes/admin_tabs.html' %}
 {% endblock %}
 
 {% block extra_css %}
@@ -17,7 +16,7 @@
 {% block body %}
 
 <main class="user-content">
-  
+  {% include 'includes/admin_tabs.html' %}
   <div class="container-fluid px-5 user-panel-wrap">
     
     <section class="user-panel">
