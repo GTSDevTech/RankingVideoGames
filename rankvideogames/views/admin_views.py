@@ -1,24 +1,52 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render
-
-from rankvideogames.models import Usuario, Category, Ranking, VideoGame
+from django.db.models import Count
+from rankvideogames.models import Usuario, Category, Ranking, VideoGame, Review
 from rankvideogames.services.ranking_stats import build_position_stats, build_global_ranking
 
 
 
 @login_required
 def go_admin(request):
+    qu = Usuario.objects.all().exclude(role=1).order_by("username")
 
-    qu = Usuario.objects.all().exclude(role=1)
     paginator = Paginator(qu, 10)
     page_number = request.GET.get("page")
     page_user = paginator.get_page(page_number)
 
+    usernames = [u.username for u in page_user.object_list]
+
+    if not usernames:
+        return render(request, "users.html", {"page_user": page_user})
+
+    rankings_map = {
+        row["user"]: row["c"]
+        for row in (
+            Ranking.objects
+            .filter(user__in=usernames)
+            .values("user")
+            .annotate(c=Count("_id"))
+        )
+    }
+
+    reviews_map = {
+        row["user"]: row["c"]
+        for row in (
+            Review.objects
+            .filter(user__in=usernames)
+            .values("user")
+            .annotate(c=Count("_id"))
+        )
+    }
+
+    for u in page_user.object_list:
+        u.rankings_count = rankings_map.get(u.username, 0)
+        u.ratings_count = reviews_map.get(u.username, 0)
+
     return render(request, "users.html", {
         "page_user": page_user,
     })
-
 
 
 @login_required

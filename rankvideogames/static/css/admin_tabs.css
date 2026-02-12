@@ -93,3 +93,83 @@
   position: relative;
   z-index: 1;             
 }
+
+
+.admin-tabs__inner{
+  --admin-bg: rgba(15, 12, 41, 0.62);     /* mismo fondo que ya usas */
+  --bubble-bg: rgba(11, 16, 32, 0.35);    /* burbuja sobre el tab */
+  --glow: rgba(168, 85, 247, 0.35);       /* glow morado */
+  --glow2: rgba(46, 226, 255, 0.25);      /* glow azul */
+}
+
+/* Indicador: pasamos a left/width para moverlo con JS más fácil */
+.admin-tab-indicator{
+  left: 8px;
+  top: 8px;
+  bottom: 8px;
+  width: 0px;
+  transform: translateX(0);
+
+  transition:
+    left .28s cubic-bezier(.2,.9,.2,1),
+    width .28s cubic-bezier(.2,.9,.2,1),
+    filter .28s cubic-bezier(.2,.9,.2,1);
+
+  /* “más fluido” */
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,.28));
+  overflow: visible;
+}
+
+/* Glow suave cuando se mueve */
+.admin-tabs__inner.is-animating .admin-tab-indicator{
+  filter:
+    drop-shadow(0 0 18px var(--glow))
+    drop-shadow(0 0 22px var(--glow2))
+    drop-shadow(0 18px 30px rgba(0,0,0,.28));
+}
+
+/* Bubble en el tab activo (como el circulito del ejemplo) */
+.admin-tab{
+  transition: transform .12s ease, color .12s ease;
+}
+
+.admin-tab::after{
+  content: "";
+  position: absolute;
+  inset: 6px 8px;
+  border-radius: 999px;
+  background: transparent;
+  transform: scale(.95);
+  opacity: 0;
+  transition: opacity .18s ease, transform .22s ease, background .22s ease;
+  z-index: 0;
+}
+
+.admin-tab.is-active::after{
+  opacity: 1;
+  transform: scale(1);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(46,226,255,.22), transparent 60%),
+    radial-gradient(circle at 70% 70%, rgba(168,85,247,.18), transparent 55%),
+    var(--bubble-bg);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 10px 22px rgba(0,0,0,.25);
+}
+
+/* Hace que icono/texto “floten” un pelín en activo */
+.admin-tab.is-active{
+  transform: translateY(-1px);
+}
+
+/* (Opcional) mini “bounce” al pulsar */
+.admin-tab.is-pressing{
+  transform: translateY(0px) scale(.98);
+}
+
+/* Respeta tus z-index: contenido arriba del indicador */
+.admin-tab.is-active,
+.admin-tab.is-active *{
+  position: relative;
+  z-index: 1;
+}

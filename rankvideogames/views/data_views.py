@@ -173,7 +173,7 @@ def create_news_categories(request):
         filter_json={},       
     )
 
-    cache.delete("boss_options_v1")
+    cache.delete("boss_options_v2")
     messages.success(request, f"Categoría creada: {name}")
     return redirect("go_data")
 
@@ -215,7 +215,7 @@ def update_category(request, code):
     cat.games = games        
     cat.save()
 
-    cache.delete("boss_options_v1")
+    cache.delete("boss_options_v2")
     messages.success(request, f"Categoría actualizada: {name}")
     return redirect("go_data")
 

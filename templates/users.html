@@ -46,31 +46,64 @@
 
       <div id="results" class="user-grid">
         {% for u in page_user %}
-        <article
-          class="user-card"
-          data-username="{{ u.username|default_if_none:'' }}"
-          data-email="{{ u.email|default_if_none:'' }}"
-          data-gender="{{ u.gender|default_if_none:'all' }}"
-        >
-          <div class="user-card__bg"></div>
+        <article class="gstats-row">
 
-          <div class="user-card__top">
-            <div class="user-avatar">
-              <img src="{{ u.avatar_url|default:'/static/img/user_default.png' }}" alt="{{ u.username }}">
-              <span class="user-ring"></span>
+          <div class="gstats-rank" aria-hidden="true">
+            <span class="gstats-rank__tag">TOP</span>
+            <span class="gstats-rank__num">#{{ forloop.counter }}</span>
+            {% if forloop.counter == 1 %}
+              <i class="fa-solid fa-crown gstats-rank__crown" aria-hidden="true"></i>
+            {% endif %}
+          </div>
+
+          <div class="gstats-cover">
+            {% if r.cover %}
+              <img src="{{ r.cover }}" alt="{{ r.name }}">
+            {% else %}
+              <div class="gstats-cover__ph">
+                <i class="fa-solid fa-gamepad"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="gstats-main">
+            <div class="gstats-title">
+              <span class="gstats-title__name">{{ r.name }}</span>
             </div>
+
+            <div class="gstats-right">
+              <div class="gstats-score">
+                <div class="gstats-score__pts">
+                  <i class="fa-solid fa-trophy"></i>
+                  <span class="gstats-score__value">{{ r.points }}</span>
+                  <span class="gstats-score__unit">pts</span>
+                </div>
+
+                <div class="gstats-score__meta">
+                  <span class="gstats-mini">
+                    <i class="fa-solid fa-users"></i>
+                    <b>{{ r.appearances }}</b> rankings
+                  </span>
+                  <span class="gstats-mini">
+                    <i class="fa-solid fa-star"></i>
+                    Avg <b>#{{ r.pos_avg }}</b>
+                  </span>
+                </div>
+              </div>
+
+              <div class="gstats-posbar" aria-label="Distribución de posiciones">
+                <span class="gpos gpos--p1"><i class="fa-solid fa-medal"></i> #1 <b>{{ r.pos_counts.1|default:0 }}</b></span>
+                <span class="gpos gpos--p2"><i class="fa-solid fa-medal"></i> #2 <b>{{ r.pos_counts.2|default:0 }}</b></span>
+                <span class="gpos gpos--p3"><i class="fa-solid fa-medal"></i> #3 <b>{{ r.pos_counts.3|default:0 }}</b></span>
+                <span class="gpos gpos--p4"><i class="fa-solid fa-hashtag"></i> #4 <b>{{ r.pos_counts.4|default:0 }}</b></span>
+                <span class="gpos gpos--p5"><i class="fa-solid fa-hashtag"></i> #5 <b>{{ r.pos_counts.5|default:0 }}</b></span>
+              </div>
+            </div>
+
           </div>
 
-          <div class="user-card__meta">
-            <div class="user-name">{{ u.username }}</div>
-            <div class="user-email">{{ u.email }}</div>
-          </div>
-
-          <div class="user-card__footer">
-            <span class="user-pill user-pill--rank">🏆 Rankings: {{ u.rankings_count|default:0 }}</span>
-            <span class="user-pill user-pill--rate">⭐ Ratings: {{ u.ratings_count|default:0 }}</span>
-          </div>
         </article>
+
         {% endfor %}
       </div>
 
@@ -80,4 +113,5 @@
 
 </main>
   <script src="/static/js/user-table.js"></script>
+
 {% endblock %}

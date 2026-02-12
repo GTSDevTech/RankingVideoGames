@@ -552,6 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.appendChild(info);
     return btn;
   }
+  
 
   // ---------- Pagination UI ----------
   let currentPage = 1;
@@ -630,8 +631,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function fetchGames({ resetPage }) {
     if (!gameGrid) return;
 
-    // ✅ A: sin filtros => grid vacío
-    if (!hasAnyFilter()) {
+    if (!hasAnyFilter() && selectedGames.size <= 0) {
       clearGamesGrid();
       ensureLoadMoreBtn(false);
 
@@ -799,7 +799,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setChipVisual(chip, false);
       });
 
-      // ✅ A: en edit también grid vacío hasta que filtres
       clearGamesGrid();
       ensureLoadMoreBtn(false);
       if (selectedGames.size > 0) {

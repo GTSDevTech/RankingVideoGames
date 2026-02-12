@@ -9,7 +9,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/users.css' %}">
   <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
-  <link rel="stylesheet" href="{% static 'css/admin_stats.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_global_stats.css' %}">
  
 {% endblock %}
 
@@ -29,7 +29,7 @@
 
         <div class="user-toolbar__right">
          <form method="get">
-            <select name="limit" onchange="this.form.submit()">
+            <select class="stats-select"  name="limit" onchange="this.form.submit()">
               {% for n in limit_options %}
                 <option value="{{ n }}" {% if n == limit %}selected{% endif %}>
                   Top {{ n }}
@@ -40,38 +40,57 @@
         </div>
       </div>
 
-      <div class="stats-grid">
+      <div class="gstats-list">
         {% for r in rows %}
-          <article class="stats-card">
+          <article class="gstats-row">
 
-            {% if r.cover %}
-              <img class="stats-card__cover" src="{{ r.cover }}" alt="{{ r.name }}">
-            {% endif %}
+            <div class="gstats-rank" aria-hidden="true">
+              <span class="gstats-rank__num">{{ forloop.counter }}</span>
+            </div>
 
-            <div class="stats-card__body">
-              <div class="stats-card__title">{{ r.name }}</div>
+            <div class="gstats-cover">
+              {% if r.cover %}
+                <img src="{{ r.cover }}" alt="{{ r.name }}">
+              {% else %}
+                <div class="gstats-cover__ph">
+                  <i class="fa-solid fa-gamepad"></i>
+                </div>
+              {% endif %}
+            </div>
 
-              <div class="stats-meta">
-                <span class="stats-pill stats-pill--accent">🏆 {{ r.points }} pts</span>
-                <span class="stats-pill">👥 {{ r.appearances }} rankings</span>
-                <span class="stats-pill">⭐ Avg: {{ r.pos_avg }}</span>
+            <div class="gstats-main">
+              <div class="gstats-title">
+                <span class="gstats-title__name">{{ r.name }}</span>
               </div>
 
-              <div class="stats-positions">
-                <span class="stats-pos">#1 · {{ r.pos_counts.1 }}</span>
-                <span class="stats-pos">#2 · {{ r.pos_counts.2 }}</span>
-                <span class="stats-pos">#3 · {{ r.pos_counts.3 }}</span>
-                <span class="stats-pos">#4 · {{ r.pos_counts.4 }}</span>
-                <span class="stats-pos">#5 · {{ r.pos_counts.5 }}</span>
+              <div class="gstats-posbar" aria-label="Distribución de posiciones">
+                <span class="gpos gpos--p1"><i class="fa-solid fa-medal"></i> #1 <b>{{ r.pos_counts.1|default:0 }}</b></span>
+                <span class="gpos gpos--p2"><i class="fa-solid fa-medal"></i> #2 <b>{{ r.pos_counts.2|default:0 }}</b></span>
+                <span class="gpos gpos--p3"><i class="fa-solid fa-medal"></i> #3 <b>{{ r.pos_counts.3|default:0 }}</b></span>
+                <span class="gpos gpos--p4"><i class="fa-solid fa-hashtag"></i> #4 <b>{{ r.pos_counts.4|default:0 }}</b></span>
+                <span class="gpos gpos--p5"><i class="fa-solid fa-hashtag"></i> #5 <b>{{ r.pos_counts.5|default:0 }}</b></span>
               </div>
             </div>
+
+       
+
+              <div class="gstats-sub">
+                <span class="gstats-chip gstats-chip--pts">
+                  <i class="fa-solid fa-trophy"></i> {{ r.points }} pts
+                </span>
+                <span class="gstats-chip">
+                  <i class="fa-solid fa-users"></i> {{ r.appearances }} rankings
+                </span>
+                <span class="gstats-chip">
+                  <i class="fa-solid fa-star"></i>Pos.Avg: {{ r.pos_avg }}
+                </span>
+              </div>
 
           </article>
         {% empty %}
           <div class="stats-empty">No hay rankings aún.</div>
         {% endfor %}
       </div>
-
     </section>
   </div>
 </main>
