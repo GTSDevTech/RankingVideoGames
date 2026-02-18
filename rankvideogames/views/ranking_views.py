@@ -124,7 +124,6 @@ def ranking_pool_api(request):
     if not ids:
         return JsonResponse({"category": {"code": cat.code, "name": cat.name}, "items": []})
 
-    # límite (si quieres respetar pool_limit)
     pool_limit = int(getattr(cat, "pool_limit", 200) or 200)
     ids = ids[:pool_limit]
 
@@ -134,7 +133,6 @@ def ranking_pool_api(request):
         .only("id", "name", "cover_url", "platforms")
     )
 
-    # preservar orden de cat.games
     gmap = {int(g.id): g for g in games}
     items = []
     for gid in ids:

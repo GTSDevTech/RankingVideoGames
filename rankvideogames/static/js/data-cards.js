@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-
-
   // =========================
   // CARDS expand/collapse
   // =========================
@@ -105,11 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.overflow = "hidden";
     modal.scrollTop = 0;
 
-    // refrescar render (por si había estado anterior)
     applyBrandFilter(currentBrand);
     applyPlatformSearch(platformSearchInput?.value || "");
 
-    // ✅ A: siempre por API. En apertura, solo si hay filtros.
     requestGamesRefresh(true);
   }
 
@@ -120,97 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.style.overflow = "";
 
     if (isEditMode) resetCategoryModalToCreate();
-  }
-
-  // ========= reset completo a CREATE =========
-  function resetCategoryModalToCreate() {
-    isEditMode = false;
-
-    if (categoryForm) categoryForm.action = CREATE_ACTION;
-
-    if (categorySubmitBtn) {
-      categorySubmitBtn.disabled = false;
-      categorySubmitBtn.textContent = "Save Category";
-    }
-
-    // inputs básicos
-    const codeInput = document.getElementById("categoryCode");
-    if (codeInput) codeInput.value = "";
-
-    const nameInput = document.querySelector('#categoryForm input[name="name"]');
-    const descInput = document.querySelector('#categoryForm textarea[name="description"]');
-    if (nameInput) nameInput.value = "";
-    if (descInput) descInput.value = "";
-
-    const minVotesInput = document.getElementById("minVotesInput") || document.querySelector('#categoryForm input[name="min_votes"]');
-    const poolLimitInput = document.getElementById("poolLimitInput") || document.querySelector('#categoryForm input[name="pool_limit"]');
-    const sortByInput = document.getElementById("sortByInput") || document.querySelector('#categoryForm input[name="sort_by"]');
-
-    if (minVotesInput) minVotesInput.value = "0";
-    if (poolLimitInput) poolLimitInput.value = "200";
-    if (sortByInput) sortByInput.value = "popular";
-
-    if (yearFromSelect) yearFromSelect.value = "";
-    if (yearToSelect) yearToSelect.value = "";
-
-    // limpiar sets
-    selected.platforms.clear();
-    selected.genres.clear();
-    selected.decades.clear();
-    selectedGames.clear();
-
-    // limpiar visual chips
-    document.querySelectorAll(".boss-chip[data-group][data-value]").forEach(chip => {
-      setChipVisual(chip, false);
-    });
-
-    // limpiar searches
-    if (platformSearchInput) platformSearchInput.value = "";
-    if (gameSearchInput) gameSearchInput.value = "";
-
-    // sync hidden + refresco
-    syncHidden();
-    syncGames();
-    applyBrandFilter(currentBrand);
-    applyPlatformSearch("");
-
-    // ✅ A: grid vacío
-    clearGamesGrid();
-    ensureLoadMoreBtn(false);
-    setGamesEmptyState("Select platforms/genres to load games.");
-  }
-
-  // Al abrir "Add Categories", SIEMPRE modo create
-  openBtns.forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      resetCategoryModalToCreate();
-      openModal();
-    });
-    btn.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        resetCategoryModalToCreate();
-        openModal();
-      }
-    });
-  });
-
-  modal?.addEventListener("click", (e) => {
-    if (e.target.closest("[data-close]")) closeModal();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
-  });
-
-  if (categoryForm) {
-    categoryForm.addEventListener("submit", () => {
-      if (categorySubmitBtn) {
-        categorySubmitBtn.disabled = true;
-        categorySubmitBtn.textContent = "Saving...";
-      }
-    });
   }
 
   // =========================
@@ -373,7 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
         applyPlatformSearch(platformSearchInput?.value || "");
       }
 
-      // ✅ cada cambio => API
       requestGamesRefresh(true);
     });
   }
@@ -392,16 +296,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const s = (name || "").toLowerCase();
 
     if (s.includes("nintendo") || s.includes("switch") || s.includes("wii") || s.includes("game boy") || s.includes("gameboy") ||
-        s.includes("nes") || s.includes("snes") || s.includes("super nintendo") || s.includes("n64") || s.includes("gamecube") ||
-        s.includes("3ds") || s.includes("ds")) return "nintendo";
+      s.includes("nes") || s.includes("snes") || s.includes("super nintendo") || s.includes("n64") || s.includes("gamecube") ||
+      s.includes("3ds") || s.includes("ds")) return "nintendo";
 
     if (s.includes("playstation") || s.includes("ps1") || s.includes("ps2") || s.includes("ps3") || s.includes("ps4") || s.includes("ps5") ||
-        s.includes("psp") || s.includes("vita")) return "sony";
+      s.includes("psp") || s.includes("vita")) return "sony";
 
     if (s.includes("xbox") || s.includes("microsoft")) return "microsoft";
 
     if (s.includes("sega") || s.includes("dreamcast") || s.includes("saturn") || s.includes("genesis") || s.includes("mega drive") ||
-        s.includes("game gear") || s.includes("master system")) return "sega";
+      s.includes("game gear") || s.includes("master system")) return "sega";
 
     if (s.includes("pc") || s.includes("windows") || s.includes("steam") || s.includes("linux") || s.includes("mac") || s.includes("dos")) return "pc";
 
@@ -467,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
       applyPlatformSearch(platformSearchInput?.value || "");
     });
 
-    applyBrandFilter(currentBrand); // inicial vacío
+    applyBrandFilter(currentBrand);
   }
 
   platformSearchInput?.addEventListener("input", () => {
@@ -492,8 +396,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectedGames = new Set();
 
+  const gameSelectAllBtn = document.getElementById("gameSelectAllBtn");
+  const gamesSelectedCount = document.getElementById("gamesSelectedCount");
+
+  function updateSelectedCount() {
+    if (!gamesSelectedCount) return;
+    gamesSelectedCount.textContent = selectedGames.size ? `${selectedGames.size} selected` : "";
+  }
+
   function syncGames() {
     if (gamesJson) gamesJson.value = JSON.stringify(Array.from(selectedGames));
+    updateSelectedCount();
   }
 
   function hasAnyFilter() {
@@ -552,7 +465,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.appendChild(info);
     return btn;
   }
-  
 
   // ---------- Pagination UI ----------
   let currentPage = 1;
@@ -740,13 +652,124 @@ document.addEventListener("DOMContentLoaded", () => {
     syncGames();
   });
 
+  // Select all (loaded in grid)
+  gameSelectAllBtn?.addEventListener("click", () => {
+    if (!gameGrid) return;
+
+    const buttons = gameGrid.querySelectorAll(".boss-game[data-id]");
+    if (!buttons.length) return;
+
+    buttons.forEach(btn => {
+      const id = btn.dataset.id;
+      if (!id) return;
+      selectedGames.add(String(id));
+      btn.classList.add("is-selected");
+    });
+
+    syncGames();
+  });
+
   gameSearchInput?.addEventListener("input", () => requestGamesRefresh(true));
   gameClearBtn?.addEventListener("click", () => {
     if (gameSearchInput) gameSearchInput.value = "";
     requestGamesRefresh(true);
   });
 
-  // init A
+  // =========================
+  // RESET a CREATE
+  // =========================
+  function resetCategoryModalToCreate() {
+    isEditMode = false;
+
+    if (categoryForm) categoryForm.action = CREATE_ACTION;
+
+    if (categorySubmitBtn) {
+      categorySubmitBtn.disabled = false;
+      categorySubmitBtn.textContent = "Save Category";
+    }
+
+    // inputs básicos
+    const codeInput = document.getElementById("categoryCode");
+    if (codeInput) codeInput.value = "";
+
+    const nameInput = document.querySelector('#categoryForm input[name="name"]');
+    const descInput = document.querySelector('#categoryForm textarea[name="description"]');
+    if (nameInput) nameInput.value = "";
+    if (descInput) descInput.value = "";
+
+    const minVotesInput = document.getElementById("minVotesInput") || document.querySelector('#categoryForm input[name="min_votes"]');
+    const poolLimitInput = document.getElementById("poolLimitInput") || document.querySelector('#categoryForm input[name="pool_limit"]');
+    const sortByInput = document.getElementById("sortByInput") || document.querySelector('#categoryForm input[name="sort_by"]');
+
+    if (minVotesInput) minVotesInput.value = "0";
+    if (poolLimitInput) poolLimitInput.value = "200";
+    if (sortByInput) sortByInput.value = "popular";
+
+    if (yearFromSelect) yearFromSelect.value = "";
+    if (yearToSelect) yearToSelect.value = "";
+
+    // limpiar sets
+    selected.platforms.clear();
+    selected.genres.clear();
+    selected.decades.clear();
+    selectedGames.clear();
+
+    // limpiar visual chips
+    document.querySelectorAll(".boss-chip[data-group][data-value]").forEach(chip => {
+      setChipVisual(chip, false);
+    });
+
+    // limpiar searches
+    if (platformSearchInput) platformSearchInput.value = "";
+    if (gameSearchInput) gameSearchInput.value = "";
+
+    // sync hidden + refresco
+    syncHidden();
+    syncGames();
+    applyBrandFilter(currentBrand);
+    applyPlatformSearch("");
+
+    clearGamesGrid();
+    ensureLoadMoreBtn(false);
+    setGamesEmptyState("Select platforms/genres to load games.");
+  }
+
+  // Al abrir "Add Categories", SIEMPRE modo create
+  openBtns.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetCategoryModalToCreate();
+      openModal();
+    });
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        resetCategoryModalToCreate();
+        openModal();
+      }
+    });
+  });
+
+  modal?.addEventListener("click", (e) => {
+    if (e.target.closest("[data-close]")) closeModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
+  });
+
+  if (categoryForm) {
+    categoryForm.addEventListener("submit", () => {
+      if (categorySubmitBtn) {
+        categorySubmitBtn.disabled = true;
+        categorySubmitBtn.textContent = "Saving...";
+      }
+    });
+  }
+
+  // =========================
+  // INIT A
+  // =========================
   syncHidden();
   syncGames();
   applyBrandFilter(currentBrand);
@@ -844,4 +867,3 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
-

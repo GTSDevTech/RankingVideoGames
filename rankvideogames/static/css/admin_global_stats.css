@@ -249,3 +249,235 @@
     height: 80px;
   }
 }
+
+/* ===== TOP RATED ROW LAYOUT ===== */
+
+.gstats-main{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+
+.gstats-stats{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.gstats-stats__left{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.gstats-stats__right{
+  display: flex;
+  align-items: center;
+}
+
+
+.gstats-btn{
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #0b1020;
+  background: linear-gradient(135deg, #0ebeef, #2ee2ff);
+  transition: all .2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gstats-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46,226,255,0.35);
+}
+
+
+.gstats-chip--pts{
+  background: linear-gradient(135deg, #facc15, #fbbf24);
+  color: #0b1020;
+}
+
+
+@media (max-width: 768px){
+  .gstats-stats{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .gstats-stats__right{
+    width: 100%;
+  }
+
+  .gstats-btn{
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* ===== COMMENTS MODAL (GLASS) ===== */
+.cmodal{
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: none;
+}
+
+.cmodal.is-open{ display: block; }
+
+.cmodal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+}
+
+/* panel centrado, estilo web */
+.cmodal__panel{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(820px, calc(100vw - 28px));
+  max-height: min(78vh, 760px);
+  transform: translate(-50%, -50%) scale(.96);
+  opacity: 0;
+
+  border-radius: 22px;
+  border: 1px solid rgba(168,85,247,0.22);
+  background: rgba(15, 12, 41, 0.78);
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+.cmodal.is-open .cmodal__panel{
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.cmodal__head{
+  padding: 14px 14px 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-bottom: 1px solid rgba(168,85,247,0.16);
+  background: linear-gradient(135deg, #022b69, #023681, #01579b);
+}
+
+.cmodal__title{
+  color: #fff;
+  font-weight: 1000;
+  letter-spacing: .02em;
+  font-size: 1.05rem;
+}
+
+.cmodal__sub{
+  margin-top: 4px;
+  color: rgba(229,231,235,0.72);
+  font-size: .88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 560px;
+}
+
+.cmodal__close{
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(229,231,235,0.95);
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease;
+}
+.cmodal__close:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.14);
+}
+
+.cmodal__body{
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  min-height: 0; /* clave para scroll interno */
+}
+
+.cmodal__meta{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* lista scrolleable */
+.cmodal__list{
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+.cmodal__list::-webkit-scrollbar{ width: 8px; }
+.cmodal__list::-webkit-scrollbar-thumb{
+  background: rgba(168,85,247,0.35);
+  border-radius: 999px;
+}
+
+.cmodal__footer{
+  display: flex;
+  justify-content: center;
+  padding-top: 6px;
+}
+
+.cmodal__more{
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(56,189,248,0.22);
+  background: rgba(255,255,255,0.06);
+  color: rgba(229,231,235,0.95);
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease;
+}
+.cmodal__more:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.10);
+}
+
+/* reutiliza tu estilo sidebar */
+.cmodal__list .comment-row{
+  margin: 0;
+}
+
+/* mobile */
+@media (max-width: 768px){
+  .cmodal__panel{
+    width: calc(100vw - 18px);
+    max-height: 82vh;
+  }
+  .cmodal__sub{ max-width: 82vw; }
+}

@@ -3,94 +3,116 @@
 
 {% block nav %}
   {% include 'includes/nav.html' %}
+  {% include 'includes/admin_tabs.html' %}
 {% endblock %}
+
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/review.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
 {% endblock %}
+
 {% block body_class %}bg-review{% endblock %}
 
 {% block body %}
 
+<main class="review-content">
 
-<main class="home-content">
-
-  <div class="container-fluid min-vh-100 p-5 align-items-flex-start d-flex-column justify-content-center">
+  <div class="carousel-box">
 
     <!-- CAROUSEL 1 -->
     <section class="review-section">
-        <div class="games-header pt-4 mb-4">
-      <div class="games-header__inner">
-        <div class="games-header__title">
-          <i class="bx bxs-trophy"></i>
-          <h2 class="m-0 header-h2">Top Popular</h2>
-        </div>
-      </div>
-  </div>
-
-      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
-        <div class="multi-carousel-inner">
-            {% for m in pop %}
-          <div class="multi-carousel-item">
-            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+      <div class="games-header pt-4 m-4">
+        <div class="games-header__inner">
+          <div class="games-header__title">
+            <i class="bx bxs-trophy"></i>
+            <h2 class="m-0 header-h2">Top Popular</h2>
           </div>
         </div>
+      </div>
+
+      <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="5000">
+        <div class="multi-carousel-viewport">
+          <div class="multi-carousel-inner">
+            {% for m in pop %}
+              <div class="multi-carousel-item">
+                <div class="img-container">
+                  <img src="{{ m.cover_url }}" alt="{{ m.name }}">
+                </div>
+              </div>
             {% endfor %}
+          </div>
         </div>
 
-        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+        <button class="multi-carousel-control-prev" type="button" data-action="prev" aria-label="Previous">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         </button>
-        <button class="multi-carousel-control-next" type="button" data-action="next">
+        <button class="multi-carousel-control-next" type="button" data-action="next" aria-label="Next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
       </div>
     </section>
 
     <!-- CAROUSEL 2 -->
-        <section class="review-section">
-      <div class="heading mt-5 mb-5 ">
-        <h2 class="text-center">Top Popular</h2>
+    <section class="review-section">
+      <div class="games-header pt-4 m-4">
+        <div class="games-header__inner">
+          <div class="games-header__title">
+            <i class="bx bxs-trophy"></i>
+            <h2 class="m-0 header-h2">Top Rated</h2>
+          </div>
+        </div>
       </div>
 
       <div class="multi-carousel-container js-multi-carousel" data-items="5" data-interval="7000">
-        <div class="multi-carousel-inner">
+        <div class="multi-carousel-viewport">
+          <div class="multi-carousel-inner">
             {% for m in rated %}
-          <div class="multi-carousel-item">
-            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+              <div class="multi-carousel-item">
+                <div class="img-container">
+                  <img src="{{ m.cover_url }}" alt="{{ m.name }}">
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
-            {% endfor %}
-        </div>
 
-        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+        <button class="multi-carousel-control-prev" type="button" data-action="prev" aria-label="Previous">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         </button>
-        <button class="multi-carousel-control-next" type="button" data-action="next">
+        <button class="multi-carousel-control-next" type="button" data-action="next" aria-label="Next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
       </div>
     </section>
 
     <!-- CAROUSEL 3 -->
-       <section class="review-section">
-      <div class="heading mt-5 mb-5 ">
-        <h2 class="text-center">Top Popular</h2>
+    <section class="review-section">
+      <div class="games-header pt-4 m-4">
+        <div class="games-header__inner">
+          <div class="games-header__title">
+            <i class="bx bxs-trophy"></i>
+            <h2 class="m-0 header-h2">Last Releases</h2>
+          </div>
+        </div>
       </div>
 
       <div class="multi-carousel-container js-multi-carousel" data-items="3" data-interval="9000">
-        <div class="multi-carousel-inner">
+        <div class="multi-carousel-viewport">
+          <div class="multi-carousel-inner">
             {% for m in new_releases %}
-          <div class="multi-carousel-item">
-            <div class="img-container"><img src="{{m.cover_url}}"  alt="{{ m.name }}">
+              <div class="multi-carousel-item">
+                <div class="img-container">
+                  <img src="{{ m.cover_url }}" alt="{{ m.name }}">
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
-            {% endfor %}
-        </div>
 
-        <button class="multi-carousel-control-prev" type="button" data-action="prev">
+        <button class="multi-carousel-control-prev" type="button" data-action="prev" aria-label="Previous">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         </button>
-        <button class="multi-carousel-control-next" type="button" data-action="next">
+        <button class="multi-carousel-control-next" type="button" data-action="next" aria-label="Next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
       </div>

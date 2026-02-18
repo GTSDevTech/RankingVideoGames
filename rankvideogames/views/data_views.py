@@ -3,11 +3,45 @@ import json
 from collections import Counter
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
 
 from rankvideogames.models import VideoGame, Category
 from rankvideogames.services.parsing import split_pipe, parse_year
+
+CACHE_KEY = "boss_options_v2"
+CACHE_TTL = 60 * 60 * 24 * 30 
+
+
+def _compute_boss_options():
+    plat_counter = Counter()
+    genre_counter = Counter()
+    years = set()
+
+    qs = VideoGame.objects.all().only("platforms", "genres", "first_release_date")
+
+    for vg in qs.iterator(chunk_size=2000):
+        for p in split_pipe(vg.platforms):
+            plat_counter[p] += 1
+        for g in split_pipe(vg.genres):
+            genre_counter[g] += 1
+        y = parse_year(vg.first_release_date)
+        if y:
+            years.add(y)
+
+    platform_options = [k for k, _ in plat_counter.most_common(80)]
+    genre_options = [k for k, _ in genre_counter.most_common(80)]
+    year_options = sorted(years, reverse=True)
+    decade_options = sorted({(y // 10) * 10 for y in years}, reverse=True)
+
+    return {
+        "platform_options": platform_options,
+        "genre_options": genre_options,
+        "year_options": year_options,
+        "decade_options": decade_options,
+    }
 
 
 def load_data_movies(request):
@@ -86,6 +120,7 @@ def load_data_movies(request):
         except Exception:
             skipped += 1
             continue
+    cache.delete(CACHE_KEY)
 
     if count == 0:
         messages.warning(
@@ -101,43 +136,31 @@ def load_data_movies(request):
 def go_data(request):
     categories = list(Category.objects.order_by("code"))
 
-    cached = cache.get("boss_options_v2")
-    if cached:
-        cached["categories"] = categories
-        return render(request, "data.html", cached)
+    cached = cache.get(CACHE_KEY)
 
-    plat_counter = Counter()
-    genre_counter = Counter()
-    years = set()
+    if not cached:
+        ctx = {
+            "platform_options": [],
+            "genre_options": [],
+            "year_options": [],
+            "decade_options": [],
+            "categories": categories,
+            "boss_options_ready": False, 
+        }
+        return render(request, "data.html", ctx)
 
-    qs = VideoGame.objects.all().only("platforms", "genres", "first_release_date")
-
-    for vg in qs.iterator(chunk_size=2000):
-        for p in split_pipe(vg.platforms):
-            plat_counter[p] += 1
-        for g in split_pipe(vg.genres):
-            genre_counter[g] += 1
-        y = parse_year(vg.first_release_date)
-        if y:
-            years.add(y)
-
-    platform_options = [k for k, _ in plat_counter.most_common(80)]
-    genre_options = [k for k, _ in genre_counter.most_common(80)]
-    year_options = sorted(years, reverse=True)
-    decade_options = sorted({(y // 10) * 10 for y in years}, reverse=True)
-
-    ctx = {
-        "platform_options": platform_options,
-        "genre_options": genre_options,
-        "year_options": year_options,
-        "decade_options": decade_options,
-        "categories": categories,
-    }
-
-    cache.set("boss_options_v2", ctx, 60 * 60 * 12)
-    return render(request, "data.html", ctx)
+    cached["categories"] = categories
+    cached["boss_options_ready"] = True
+    return render(request, "data.html", cached)
 
 
+@staff_member_required
+def rebuild_boss_options(request):
+
+    opts = _compute_boss_options()
+    cache.set(CACHE_KEY, opts, CACHE_TTL)
+    messages.success(request, "Opciones recalculadas y cacheadas (boss_options_v2).")
+    return redirect("go_data")
 
 
 def create_news_categories(request):
@@ -169,18 +192,13 @@ def create_news_categories(request):
         code=next_code,
         name=name,
         description=description,
-        games=games,          
-        filter_json={},       
+        games=games,
+        filter_json={},
     )
 
-    cache.delete("boss_options_v2")
+    cache.delete(CACHE_KEY)
     messages.success(request, f"Categoría creada: {name}")
     return redirect("go_data")
-
-
-
-    
-
 
 
 def update_category(request, code):
@@ -212,13 +230,12 @@ def update_category(request, code):
 
     cat.name = name
     cat.description = description
-    cat.games = games        
+    cat.games = games
     cat.save()
 
-    cache.delete("boss_options_v2")
+    cache.delete(CACHE_KEY)
     messages.success(request, f"Categoría actualizada: {name}")
     return redirect("go_data")
-
 
 
 def delete_category(request, code):
@@ -233,6 +250,3 @@ def delete_category(request, code):
     cat.delete()
     messages.success(request, "Categoría eliminada.")
     return redirect("go_data")
-
-
-

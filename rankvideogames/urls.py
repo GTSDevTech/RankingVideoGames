@@ -8,18 +8,27 @@ urlpatterns = [
     path("login/", auth_view, name="go_login"),
     path("logout/", logout_user, name="logout"),
 
+
+    # USER
+    
     path("home/", go_home, name="go_home"),
     path("ranking/", go_ranking, name="go_ranking"),
     path("review/", go_statistics, name="go_review"),
     path("data/", go_data, name="go_data"),
-
+    path("users/review/", go_statistics, name="go_admin_review"),
+    
     # ADMIN
     path("users/", go_admin, name="go_admin"),
     path("users/stats/", go_admin_stats, name="go_admin_stats"),
     path("users/global/", go_admin_global_ranking, name="go_admin_global_ranking"),
+    path("users/top-rated/", go_admin_top_rated, name="go_admin_top_rated"),
+    path("users/top-rated/comments/", admin_game_comments_json, name="admin_game_comments_json"),
+
+
 
     # CSV
     path("boss/load-data/", load_data_movies, name="load_data_movies"),
+    path("data/rebuild-options/", rebuild_boss_options, name="rebuild_boss_options"),
 
     # Categories
     path("boss/create-news-categories/", create_news_categories, name="create_news_categories"),

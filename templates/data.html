@@ -18,6 +18,18 @@
 <main class="boss-content">
   <div class="container px-5 min-vh-100 min-vw-100">
 
+    {% if not boss_options_ready %}
+      <div class="alert alert-warning boss-options-alert" role="alert">
+        Precalcular nuevos datos en BD para categorías.
+        {% if user.is_staff %}
+          <a class="btn btn-load btn-sm ms-2 btn-warning" href="{% url 'rebuild_boss_options' %}">
+            Rebuild options
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+
     <section class="boss-wrapper">
 
       <!-- TOP: 2 CARDS -->

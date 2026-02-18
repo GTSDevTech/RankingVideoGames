@@ -29,6 +29,30 @@
     background-attachment: fixed !important;
   }
 
+  .alert{
+    max-width: 30% !important;
+    justify-content: left !important;
+  }
+
+
+  .boss-options-alert{
+    margin: 10px auto 18px;
+    max-width: 100% !important;
+    border-radius: 14px;
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    background: rgba(15, 12, 41, 0.78);
+    color: var(--rk-text);
+    box-shadow: 0 10px 22px rgba(0,0,0,.35);
+
+  }
+
+  .btn-load{
+    border-radius: 999px !important;
+    font-weight: 800 !important;
+    background-color: #ef0e1993 !important;
+    color: #fff
+  }
+
   .container-data{
       display: flex;
       align-items: center;
@@ -271,9 +295,6 @@
   pointer-events: none;
 }
 
-
-
-/* ===== ancho del expander a 2 columnas (como el ejemplo) ===== */
 @media (min-width: 861px){
   .boss-card .boss-card__expander{
     width: calc(200% + 18px);
@@ -306,13 +327,13 @@
   margin: 0 auto;
 }
 
-/* Las 2 cards arriba */
+
 .boss-cards--top{
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
 }
 
-/* Sección debajo */
+
 .boss-section{
   border-radius: 18px;
   border: 1px solid rgba(168, 85, 247, 0.20);
@@ -350,15 +371,12 @@
   width: 100%;
 }
 
-/* Grid de categorías */
-/* ============ Categories grid wrapper ============ */
 .boss-cat-wrapper{
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-/* Grid de categorías */
 .boss-cat-grid{
   width: min(1100px, 100%);
   display: grid;
@@ -494,7 +512,7 @@
 
 .boss-cat-btn i{ font-size: 16px; }
 
-/* Edit */
+
 .boss-cat-btn--edit{
   background-color: #0ebeef;
 }
@@ -510,14 +528,14 @@
   box-shadow: 0 0 14px rgba(46,226,255,.14);
 }
 
-/* Delete */
+
 .boss-cat-btn--del:hover{
   transform: translateY(-1px);
   border-color: rgba(255,46,214,.55);
   box-shadow: 0 0 14px rgba(255,46,214,.14);
 }
 
-/* Responsive */
+
 @media (max-width: 1100px){
   .boss-cat-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
@@ -526,7 +544,7 @@
   .boss-cat-grid{ grid-template-columns: 1fr; }
 }
 
-/* Importante: el expander ancho solo aplica arriba */
+
 @media (min-width: 861px){
   .boss-cards--top .boss-card .boss-card__expander{
     width: calc(200% + 18px);
@@ -561,6 +579,7 @@
   display: none;
   width: 100%;
   position: fixed;
+  align-self: center !important;
   inset: 0;
   z-index: 50000;
   overflow-y: auto;                 /* scroll del modal (página del modal) */

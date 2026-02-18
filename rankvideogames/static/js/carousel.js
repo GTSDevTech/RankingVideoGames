@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".js-multi-carousel").forEach((carousel) => {
     const carouselInner = carousel.querySelector(".multi-carousel-inner");
+    const viewport = carousel.querySelector(".multi-carousel-viewport") || carousel;
+
     const prevBtn = carousel.querySelector('[data-action="prev"]');
     const nextBtn = carousel.querySelector('[data-action="next"]');
 
@@ -22,13 +24,16 @@ document.addEventListener("DOMContentLoaded", () => {
       carousel.querySelectorAll(".clone").forEach((c) => c.remove());
 
       const originalItems = getOriginalItems();
-      const total = originalItems.length;
 
-      const lastClones = originalItems.slice(-itemsPerSlide).map((item) => {
-        const clone = item.cloneNode(true);
-        clone.classList.add("clone");
-        return clone;
-      }).reverse();
+      const lastClones = originalItems
+        .slice(-itemsPerSlide)
+        .map((item) => {
+          const clone = item.cloneNode(true);
+          clone.classList.add("clone");
+          return clone;
+        })
+        .reverse();
+
       lastClones.forEach((clone) => carouselInner.prepend(clone));
 
       const firstClones = originalItems.slice(0, itemsPerSlide).map((item) => {
@@ -36,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clone.classList.add("clone");
         return clone;
       });
+
       firstClones.forEach((clone) => carouselInner.append(clone));
 
       position = itemsPerSlide;
@@ -80,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
       updateCarouselPosition(true);
     }
 
-    nextBtn.addEventListener("click", () => { next(); registerUserActivity(); });
-    prevBtn.addEventListener("click", () => { prev(); registerUserActivity(); });
+    if (nextBtn) nextBtn.addEventListener("click", () => { next(); registerUserActivity(); });
+    if (prevBtn) prevBtn.addEventListener("click", () => { prev(); registerUserActivity(); });
 
     // Drag
     let isDragging = false;
@@ -103,7 +109,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function drag(e) {
       if (!isDragging) return;
       const x = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
-      const walk = ((x - startX) / carousel.offsetWidth) * itemsPerSlide;
+
+      // ✅ usamos el ancho del viewport (no el del container con botones)
+      const width = viewport.offsetWidth || carousel.offsetWidth || 1;
+
+      const walk = ((x - startX) / width) * itemsPerSlide;
       const newPosition = startPosition - walk;
       const translateX = (newPosition * -100) / itemsPerSlide;
       carouselInner.style.transform = `translateX(${translateX}%)`;
@@ -123,7 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ? e.changedTouches[0].clientX
         : startX;
 
-      const walk = ((x - startX) / carousel.offsetWidth) * itemsPerSlide;
+      const width = viewport.offsetWidth || carousel.offsetWidth || 1;
+      const walk = ((x - startX) / width) * itemsPerSlide;
 
       if (walk > 0.2) prev();
       else if (walk < -0.2) next();
@@ -161,9 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Resize
     function updateConfig() {
-     const w = window.innerWidth;
+      const w = window.innerWidth;
 
-    if (w < 720) itemsPerSlide = 1;
+      if (w < 720) itemsPerSlide = 1;
       else if (w < 992) itemsPerSlide = 3;
       else if (w < 1800) itemsPerSlide = 4;
       else itemsPerSlide = parseInt(carousel.dataset.items || "5", 10);
@@ -172,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
       initializeClones();
     }
 
-    window.addEventListener("resize", () => updateConfig());
+    window.addEventListener("resize", updateConfig);
 
     // Init
     initializeClones();
@@ -181,14 +192,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
+// (lo tuyo del dropdown, lo dejo bien cerrado y sin tocar nombres)
 document.addEventListener("DOMContentLoaded", () => {
   const hidden = document.getElementById("search_by");
+  if (!hidden) return;
+
   document.querySelectorAll(".dropdown-menu .dropdown-item[data-value]").forEach(item => {
     item.addEventListener("click", (e) => {
       e.preventDefault();
       hidden.value = item.dataset.value;
-      item.closest(".input-group").querySelector(".btn-search-dropdown").textContent = item.textContent.trim();
+      const group = item.closest(".input-group");
+      const btn = group?.querySelector(".btn-search-dropdown");
+      if (btn) btn.textContent = item.textContent.trim();
     });
   });
 });
+

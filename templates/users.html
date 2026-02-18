@@ -14,13 +14,13 @@
 {% block body_class %}bg-user{% endblock %}
 
 {% block body %}
-
 <main class="user-content">
   {% include 'includes/admin_tabs.html' %}
+
   <div class="container-fluid px-5 user-panel-wrap">
-    
     <section class="user-panel">
 
+      <!-- Toolbar -->
       <div class="user-toolbar">
         <div class="user-toolbar__left">
           <span class="user-dot"></span>
@@ -44,74 +44,63 @@
         </div>
       </div>
 
+      <!-- Grid -->
       <div id="results" class="user-grid">
         {% for u in page_user %}
-        <article class="gstats-row">
+          <article class="user-card"
+                   data-username="{{ u.username|default:''|escape }}"
+                   data-email="{{ u.email|default:''|escape }}"
+                   data-gender="{{ u.gender|default:'U'|escape }}">
 
-          <div class="gstats-rank" aria-hidden="true">
-            <span class="gstats-rank__tag">TOP</span>
-            <span class="gstats-rank__num">#{{ forloop.counter }}</span>
-            {% if forloop.counter == 1 %}
-              <i class="fa-solid fa-crown gstats-rank__crown" aria-hidden="true"></i>
-            {% endif %}
-          </div>
+            <!-- Background layer (CSS la usa) -->
+            <div class="user-card__bg" aria-hidden="true"></div>
 
-          <div class="gstats-cover">
-            {% if r.cover %}
-              <img src="{{ r.cover }}" alt="{{ r.name }}">
-            {% else %}
-              <div class="gstats-cover__ph">
-                <i class="fa-solid fa-gamepad"></i>
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="gstats-main">
-            <div class="gstats-title">
-              <span class="gstats-title__name">{{ r.name }}</span>
-            </div>
-
-            <div class="gstats-right">
-              <div class="gstats-score">
-                <div class="gstats-score__pts">
-                  <i class="fa-solid fa-trophy"></i>
-                  <span class="gstats-score__value">{{ r.points }}</span>
-                  <span class="gstats-score__unit">pts</span>
+            <!-- TOP: avatar + username + email -->
+            <div class="user-card__top" style="display:flex; align-items:center; gap:12px;">
+              <div class="user-avatar">
+                {# No invento campos: si no tienes avatar, deja placeholder con iniciales #}
+                <div style="
+                  width:100%; height:100%;
+                  display:grid; place-items:center;
+                  font-weight:1000; color:#0b1020;
+                  background: linear-gradient(135deg, var(--register-color), var(--register-color-2));
+                ">
+                  {{ u.username|default:"?"|slice:":1"|upper }}
                 </div>
-
-                <div class="gstats-score__meta">
-                  <span class="gstats-mini">
-                    <i class="fa-solid fa-users"></i>
-                    <b>{{ r.appearances }}</b> rankings
-                  </span>
-                  <span class="gstats-mini">
-                    <i class="fa-solid fa-star"></i>
-                    Avg <b>#{{ r.pos_avg }}</b>
-                  </span>
-                </div>
+                <span class="user-ring" aria-hidden="true"></span>
               </div>
 
-              <div class="gstats-posbar" aria-label="Distribución de posiciones">
-                <span class="gpos gpos--p1"><i class="fa-solid fa-medal"></i> #1 <b>{{ r.pos_counts.1|default:0 }}</b></span>
-                <span class="gpos gpos--p2"><i class="fa-solid fa-medal"></i> #2 <b>{{ r.pos_counts.2|default:0 }}</b></span>
-                <span class="gpos gpos--p3"><i class="fa-solid fa-medal"></i> #3 <b>{{ r.pos_counts.3|default:0 }}</b></span>
-                <span class="gpos gpos--p4"><i class="fa-solid fa-hashtag"></i> #4 <b>{{ r.pos_counts.4|default:0 }}</b></span>
-                <span class="gpos gpos--p5"><i class="fa-solid fa-hashtag"></i> #5 <b>{{ r.pos_counts.5|default:0 }}</b></span>
+              <div style="min-width:0;">
+                <div class="user-name" title="{{ u.username }}">{{ u.username }}</div>
+                <div class="user-email" title="{{ u.email|default:'' }}">{{ u.email|default:"—" }}</div>
               </div>
             </div>
 
-          </div>
+            <!-- META (lo mantenemos aunque vacío para respetar estructura CSS) -->
+            <div class="user-card__meta"></div>
 
-        </article>
+            <!-- FOOTER: pills con contadores (esto sí lo tienes en la vista) -->
+            <div class="user-card__footer">
+              <span class="user-pill">
+                <i class="fa-solid fa-ranking-star"></i>
+                {{ u.rankings_count|default:0 }} rankings
+              </span>
 
+              <span class="user-pill">
+                <i class="fa-solid fa-star"></i>
+                {{ u.ratings_count|default:0 }} reviews
+              </span>
+            </div>
+
+          </article>
+        {% empty %}
+          <div class="stats-empty">No hay usuarios.</div>
         {% endfor %}
       </div>
 
     </section>
   </div>
-
-
 </main>
-  <script src="/static/js/user-table.js"></script>
 
+<script src="{% static 'js/user-table.js' %}"></script>
 {% endblock %}

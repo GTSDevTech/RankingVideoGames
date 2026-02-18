@@ -1,11 +1,17 @@
 from .public_views import go_home
 from .auth_views import auth_view, logout_user
-from .admin_views import go_admin, go_admin_stats, go_admin_global_ranking
+from .admin_views import (go_admin, 
+                go_admin_stats, 
+                go_admin_global_ranking, 
+                go_admin_top_rated,
+                admin_game_comments_json
+)
+
 from .ranking_views import go_ranking, save_ranking, my_ranking_api, ranking_pool_api
 from .review_views import go_statistics
 from .data_views import (
     go_data, load_data_movies, create_news_categories,
-    update_category, delete_category
+    update_category, delete_category, rebuild_boss_options
 )
 from .rating_views import (
     my_review_api, save_review_api, last_comments_api,

@@ -1,29 +1,52 @@
 {% load static %}
 
-
 <div class="admin-tabs" data-admin-tabs>
   <div class="admin-tabs__inner">
-    <a href="{% url 'go_admin' %}"
-       class="admin-tab {% if request.resolver_match.url_name == 'go_admin' %}is-active{% endif %}"
-       data-tab="users"
-       aria-current="{% if request.resolver_match.url_name == 'go_admin' %}page{% endif %}">
-      <i class="fa-solid fa-users"></i>
-      <span>Users</span>
-    </a>
+
+    {# SOLO admins (role == 1) ven Users #}
+    {% if user.is_authenticated and user.role == 1 %}
+      <a href="{% url 'go_admin' %}"
+         class="admin-tab {% if request.resolver_match.url_name == 'go_admin' %}is-active{% endif %}"
+         data-tab="users"
+         aria-current="{% if request.resolver_match.url_name == 'go_admin' %}page{% endif %}">
+        <i class="fa-solid fa-users"></i>
+        <span>Users</span>
+      </a>
+    {% endif %}
 
     <a href="{% url 'go_admin_stats' %}?category={{ category_code|default:1 }}"
-      class="admin-tab {% if request.resolver_match.url_name == 'go_admin_stats' %}is-active{% endif %}">
+       class="admin-tab {% if request.resolver_match.url_name == 'go_admin_stats' %}is-active{% endif %}"
+       data-tab="categories">
       <i class="fa-solid fa-chart-column"></i>
       <span>Categories Stats</span>
     </a>
+
     <a href="{% url 'go_admin_global_ranking' %}"
-      class="admin-tab {% if request.resolver_match.url_name == 'go_admin_global_ranking' %}is-active{% endif %}"
-      data-tab="global">
+       class="admin-tab {% if request.resolver_match.url_name == 'go_admin_global_ranking' %}is-active{% endif %}"
+       data-tab="global"
+       aria-current="{% if request.resolver_match.url_name == 'go_admin_global_ranking' %}page{% endif %}">
       <i class="fa-solid fa-ranking-star"></i>
       <span>Global Games Stats</span>
     </a>
+
+    <a href="{% url 'go_admin_top_rated' %}"
+       class="admin-tab {% if request.resolver_match.url_name == 'go_admin_top_rated' %}is-active{% endif %}"
+       data-tab="top-rated"
+       aria-current="{% if request.resolver_match.url_name == 'go_admin_top_rated' %}page{% endif %}">
+      <i class="fa-solid fa-star"></i>
+      <span>Top Rated</span>
+    </a>
+    {% if user.role == 2 %}
+
+    <a href="{% url 'go_review' %}"
+      class="admin-tab {% if request.resolver_match.url_name == 'go_review' %}is-active{% endif %}">
+      <i class="fa-solid fa-clapperboard"></i>
+      <span>Review</span>
+    </a>
+    {% endif %}
+
     <span class="admin-tab-indicator" aria-hidden="true"></span>
   </div>
 </div>
 
-<script src="/static/js/admin_tabs.js"></script>
+<script src="{% static 'js/admin_tabs.js' %}"></script>

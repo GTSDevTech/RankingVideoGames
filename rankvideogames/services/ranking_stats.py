@@ -1,11 +1,12 @@
 
-
 from collections import defaultdict
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from rankvideogames.models import Ranking, VideoGame
+
 
 def build_position_stats(qs_rankings):
-    """
-    game_id -> votes + media posición + conteo por posiciones (1..5)
-    """
+
     acc_votes = defaultdict(int)
     acc_pos_sum = defaultdict(int)
     acc_pos_counts = defaultdict(lambda: defaultdict(int))
@@ -32,23 +33,10 @@ def build_position_stats(qs_rankings):
         }
     return out
 
-from collections import defaultdict
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from rankvideogames.models import Ranking, VideoGame
 
 
 def build_global_ranking(qs_rankings):
-    """
-      game_id -> {
-      points: int,
-      appearances: int,
-      pos_sum: int,
-      pos_avg: float,
-      pos_counts: {1..5}
-    }
-    Pesos: pos1=5, pos2=4, pos3=3, pos4=2, pos5=1
-    """
+    
     weights = {1: 5, 2: 4, 3: 3, 4: 2, 5: 1}
 
     appearances = defaultdict(int)
@@ -58,7 +46,6 @@ def build_global_ranking(qs_rankings):
 
     for rk in qs_rankings:
         rating = rk.rating or []
-        # seguridad: 1 aparición por ranking (por si hay duplicados raros)
         seen_in_this_ranking = set()
 
         for idx, game_id in enumerate(rating):

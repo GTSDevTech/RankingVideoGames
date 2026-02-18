@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav %}
+  {% include 'includes/nav.html' %}
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/users.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_global_stats.css' %}">
+{% endblock %}
+
+{% block body_class %}bg-user{% endblock %}
+
+{% block body %}
+<main class="user-content">
+  {% include 'includes/admin_tabs.html' %}
+
+  <div class="container-fluid px-5 user-panel-wrap">
+    <section class="user-panel">
+
+      <div class="user-toolbar">
+        <div class="user-toolbar__left">
+          <span class="user-dot"></span>
+          <h2 class="user-title">Top Rated (Reviews)</h2>
+        </div>
+
+        <div class="user-toolbar__right">
+          <form method="get">
+            <select class="stats-select" name="per_page" onchange="this.form.submit()">
+              {% for n in per_page_options %}
+                <option value="{{ n }}" {% if n == per_page %}selected{% endif %}>Top {{ n }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <div class="gstats-list">
+        {% for r in rows %}
+          <article class="gstats-row">
+
+            <div class="gstats-rank" aria-hidden="true">
+              <span class="gstats-rank__num">{{ forloop.counter0|add:page_obj.start_index }}</span>
+            </div>
+
+            <div class="gstats-cover">
+              {% if r.cover %}
+                <img src="{{ r.cover }}" alt="{{ r.name }}">
+              {% else %}
+                <div class="gstats-cover__ph">
+                  <i class="fa-solid fa-gamepad"></i>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="gstats-main">
+            <div class="gstats-title">
+                <span class="gstats-title__name">{{ r.name }}</span>
+            </div>
+
+            <div class="gstats-stats">
+                <div class="gstats-stats__left">
+                <span class="gstats-chip gstats-chip--pts">
+                    <i class="fa-solid fa-star"></i> {{ r.avg_rating }}
+                </span>
+
+                <span class="gstats-chip">
+                    <i class="fa-solid fa-comment"></i> {{ r.votes }} reviews
+                </span>
+                </div>
+
+                <div class="gstats-stats__right">
+                <a href="#"
+                class="gstats-btn js-open-comments"
+                data-game-id="{{ r.game_id }}"
+                data-game-name="{{ r.name|escape }}">
+                <i class="fa-solid fa-eye"></i> View comments
+                </a>
+                </div>
+            </div>
+            </div>
+
+          </article>
+        {% empty %}
+          <div class="stats-empty">No hay valoraciones aún.</div>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pagination-wrap" aria-label="Top rated pagination">
+        <ul class="pagination pagination-gamer justify-content-center">
+
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link page-link-back"
+                 href="?page={{ page_obj.previous_page_number }}&per_page={{ per_page }}">«</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link page-link-back">«</span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:"-3" and num <= page_obj.number|add:"3" %}
+              {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}&per_page={{ per_page }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link page-link-forward"
+                 href="?page={{ page_obj.next_page_number }}&per_page={{ per_page }}">»</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link page-link-forward">»</span></li>
+          {% endif %}
+
+        </ul>
+
+        <p class="text-center games-sub m-0">
+          Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </p>
+      </nav>
+      {% endif %}
+
+    </section>
+  </div>
+</main>
+
+
+<!-- COMMENTS MODAL -->
+<div class="cmodal" id="commentsModal" aria-hidden="true"
+     data-endpoint="{% url 'admin_game_comments_json' %}">
+  <div class="cmodal__backdrop" data-close></div>
+
+  <section class="cmodal__panel" role="dialog" aria-modal="true" aria-labelledby="cmodalTitle">
+    <header class="cmodal__head">
+      <div>
+        <div class="cmodal__title" id="cmodalTitle">Comments</div>
+        <div class="cmodal__sub" id="cmodalSub">—</div>
+      </div>
+
+      <button class="cmodal__close" type="button" data-close aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <div class="cmodal__body">
+      <div class="cmodal__meta">
+        <span class="gstats-chip gstats-chip--pts" id="cmodalAvg">
+          <i class="fa-solid fa-star"></i> Avg: —
+        </span>
+        <span class="gstats-chip" id="cmodalCount">
+          <i class="fa-solid fa-comment"></i> — reviews
+        </span>
+      </div>
+
+      <div class="cmodal__list" id="cmodalList"></div>
+
+      <div class="cmodal__footer">
+        <button class="cmodal__more" id="cmodalMore" type="button">
+          Load more
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="/static/js/admin_comments_modal.js"></script>
+
+{% endblock %}

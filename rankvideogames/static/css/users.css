@@ -21,7 +21,7 @@ body.bg-user{
   font-family: 'Inter', sans-serif;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  background-image: url('/static/img/switch_games.png') !important;
+  background-image: url('/static/img/wallpaper3.jpg') !important;
   background-repeat: no-repeat !important;
   background-size: cover;
   background-attachment: fixed;
@@ -29,19 +29,19 @@ body.bg-user{
 
 
 
-/* Igual que HOME: baja el contenido con top:160 */
 .user-content{
   position: relative;
   top: 160px !important;
+  padding-top: 86px;
   display: flex;
   flex-direction: column;
   width: 100%;
   min-height: calc(100vh - 160px);
-  justify-content: flex-start;   /* arriba */
-  align-items: center;           /* centrado horizontal */
+  justify-content: flex-start;  
+  align-items: center;      
 }
 
-/* wrapper: NO center vertical */
+
 .user-panel-wrap{
   width: 100%;
   display: flex;
@@ -50,7 +50,7 @@ body.bg-user{
   padding-bottom: 24px;
 }
 
-/* panel */
+
 .user-panel{
   width: min(1100px, 92%);
   background: rgba(15, 12, 41, 0.55);
@@ -61,7 +61,7 @@ body.bg-user{
   padding: 16px;
 }
 
-/* toolbar */
+
 .user-toolbar{
   display: grid;
   grid-template-columns: 1fr minmax(260px, 520px) 1fr;
@@ -87,6 +87,7 @@ body.bg-user{
 
 .user-toolbar__left{
   display: inline-flex;
+  width: 100%;
   align-items: center;
   gap: 10px;
 }
