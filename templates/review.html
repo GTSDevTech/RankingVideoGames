@@ -4,11 +4,13 @@
 {% block nav %}
   {% include 'includes/nav.html' %}
   {% include 'includes/admin_tabs.html' %}
+  
 {% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/review.css' %}">
   <link rel="stylesheet" href="{% static 'css/admin_tabs.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block body_class %}bg-review{% endblock %}
@@ -37,6 +39,9 @@
               <div class="multi-carousel-item">
                 <div class="img-container">
                   <img src="{{ m.cover_url }}" alt="{{ m.name }}">
+                </div>
+                 <div class="carousel-game-name" title="{{ m.name }}">
+                  {{ m.name }}
                 </div>
               </div>
             {% endfor %}
@@ -71,6 +76,9 @@
                 <div class="img-container">
                   <img src="{{ m.cover_url }}" alt="{{ m.name }}">
                 </div>
+                 <div class="carousel-game-name" title="{{ m.name }}">
+                  {{ m.name }}
+                </div>
               </div>
             {% endfor %}
           </div>
@@ -103,6 +111,9 @@
               <div class="multi-carousel-item">
                 <div class="img-container">
                   <img src="{{ m.cover_url }}" alt="{{ m.name }}">
+                </div>
+                 <div class="carousel-game-name" title="{{ m.name }}">
+                  {{ m.name }}
                 </div>
               </div>
             {% endfor %}

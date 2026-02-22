@@ -3,7 +3,7 @@
 <div class="admin-tabs" data-admin-tabs>
   <div class="admin-tabs__inner">
 
-    {# SOLO admins (role == 1) ven Users #}
+
     {% if user.is_authenticated and user.role == 1 %}
       <a href="{% url 'go_admin' %}"
          class="admin-tab {% if request.resolver_match.url_name == 'go_admin' %}is-active{% endif %}"

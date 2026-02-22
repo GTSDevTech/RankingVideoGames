@@ -176,7 +176,7 @@ body.bg-user{
   box-shadow: 0 0 16px rgba(255,46,214,.22);
 }
 
-/* grid users */
+
 .user-grid{
   margin-top: 14px;
   display: grid;
@@ -193,7 +193,7 @@ body.bg-user{
 
 
 
-/* card */
+
 .user-card{
   position: relative !important;
 
@@ -234,7 +234,7 @@ body.bg-user{
     rgba(2,54,129,.35) 100%) !important;
 }
 
-/* contenido encima de todo */
+
 .user-card__top,
 .user-card__meta,
 .user-card__footer{
@@ -242,8 +242,6 @@ body.bg-user{
   z-index: 9999 !important;
 }
 
-
-/* overlay encima */
 
 .user-avatar{
   width: 62px;

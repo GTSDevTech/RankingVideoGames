@@ -150,8 +150,6 @@ color: #fff;
 
   
 
-  /* ========== Gender cards ========== */
-
 .rk-gender__grid{
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -284,7 +282,7 @@ color: #fff;
     border-radius: 0 30px 30px 0 !important;
   }
 
-  /* LOGIN activo */
+
   #authTabs.nav.nav-pills .nav-item #tab-login.active {
     background: linear-gradient(135deg, var(--login-color), #ff2ed6) !important;
     color: #ffffff !important;
@@ -295,7 +293,6 @@ color: #fff;
     transform: scale(1.05) !important;
   }
 
-  /* REGISTER activo */
   #authTabs.nav.nav-pills .nav-item #tab-register.active {
     background: linear-gradient(135deg, var(--register-color), #2ee2ff) !important;
     color: #ffffff !important;
@@ -306,27 +303,27 @@ color: #fff;
     transform: scale(1.05) !important;
   }
 
-  /* INACTIVO - Manteniendo tu estilo original */
+
   #authTabs.nav.nav-pills .nav-item .nav-link:not(.active) {
     background-color: var(--inactive-bg) !important;
     color: var(--inactive-color) !important;
   }
 
-  /* HOVER LOGIN inactivo */
+
   #authTabs.nav.nav-pills .nav-item #tab-login:hover:not(.active) {
     background-color: rgba(210, 4, 194, 0.2) !important;
     color: #ffffff !important;
     box-shadow: 0 0 8px rgba(210, 4, 194, 0.5) !important;
   }
 
-  /* HOVER REGISTER inactivo */
+
   #authTabs.nav.nav-pills .nav-item #tab-register:hover:not(.active) {
     background-color: rgba(14, 190, 239, 0.2) !important;
     color: #ffffff !important;
     box-shadow: 0 0 8px rgba(14, 190, 239, 0.5) !important;
   }
 
-  /* QUITAR FOCUS */
+
   #authTabs .nav-link:focus,
   #authTabs .nav-link:focus-visible {
     outline: none !important;

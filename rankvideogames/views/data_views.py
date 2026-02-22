@@ -1,4 +1,5 @@
 import csv
+import io
 import json
 from collections import Counter
 
@@ -8,7 +9,7 @@ from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
-from rankvideogames.models import VideoGame, Category
+from rankvideogames.models import VideoGame, Category, Ranking
 from rankvideogames.services.parsing import split_pipe, parse_year
 
 CACHE_KEY = "boss_options_v2"
@@ -43,7 +44,7 @@ def _compute_boss_options():
         "decade_options": decade_options,
     }
 
-
+@staff_member_required
 def load_data_movies(request):
     if request.method != "POST":
         messages.error(request, "Elige un archivo.")
@@ -54,8 +55,14 @@ def load_data_movies(request):
         messages.error(request, "No se ha seleccionado ningún archivo.")
         return redirect("go_data")
 
-    decoded_file = update_file.read().decode("utf-8-sig").splitlines()
-    reader = csv.DictReader(decoded_file)
+    raw = update_file.read().decode("utf-8-sig", errors="replace")
+    buf = io.StringIO(raw)
+
+    dialect = csv.Sniffer().sniff(raw[:4096], delimiters=[",",";","\t"])
+    reader = csv.DictReader(buf, dialect=dialect)
+
+    if reader.fieldnames:
+        reader.fieldnames = [h.strip().strip(";").replace("\r","") for h in reader.fieldnames]
 
     required_cols = {
         "id", "name", "slug", "first_release_date", "platforms", "genres",
@@ -162,7 +169,7 @@ def rebuild_boss_options(request):
     messages.success(request, "Opciones recalculadas y cacheadas (boss_options_v2).")
     return redirect("go_data")
 
-
+@staff_member_required
 def create_news_categories(request):
     if request.method != "POST":
         return redirect("go_data")
@@ -196,11 +203,10 @@ def create_news_categories(request):
         filter_json={},
     )
 
-    cache.delete(CACHE_KEY)
     messages.success(request, f"Categoría creada: {name}")
     return redirect("go_data")
 
-
+@staff_member_required
 def update_category(request, code):
     if request.method != "POST":
         return redirect("go_data")
@@ -233,11 +239,10 @@ def update_category(request, code):
     cat.games = games
     cat.save()
 
-    cache.delete(CACHE_KEY)
     messages.success(request, f"Categoría actualizada: {name}")
     return redirect("go_data")
 
-
+@staff_member_required
 def delete_category(request, code):
     if request.method != "POST":
         return redirect("go_data")
@@ -245,6 +250,12 @@ def delete_category(request, code):
     cat = Category.objects.filter(code=code).first()
     if not cat:
         messages.error(request, "Categoría no encontrada.")
+        return redirect("go_data")
+    if Ranking.objects.filter(categoryCode=cat.code).exists():
+        messages.error(
+            request,
+            "No se puede eliminar la categoría porque ya tiene rankings asociados."
+        )
         return redirect("go_data")
 
     cat.delete()

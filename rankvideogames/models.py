@@ -83,7 +83,7 @@ class Category(models.Model):
 
     filter_json = models.JSONField(default=dict, blank=True)
 
-    pool_limit = models.IntegerField(default=20)
+    pool_limit = models.IntegerField(default=200)
     sort_by = models.CharField(
     max_length=40,
     choices=[

@@ -106,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
     applyBrandFilter(currentBrand);
     applyPlatformSearch(platformSearchInput?.value || "");
 
+    // ✅ asegurar contador en apertura
+    syncGames();
+
     requestGamesRefresh(true);
   }
 
@@ -144,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleNormalChip(btn) {
-    const group = btn.dataset.group; // platforms|genres
+    const group = btn.dataset.group;
     const value = (btn.dataset.value || "").trim();
     if (!group || !value || !(group in selected)) return;
 
@@ -290,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const platformSearchInput = document.getElementById("platformSearchInput");
   const platformClearBtn = document.getElementById("platformClearBtn");
 
-  let currentBrand = null; // por defecto VACÍO (no muestra nada salvo seleccionados)
+  let currentBrand = null;
 
   function platformBrandOf(name) {
     const s = (name || "").toLowerCase();
@@ -386,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =========================
-  // GAMES: server search + select (A)
+  // GAMES: server search + select + COUNT + SELECT ALL TOGGLE
   // =========================
   const gameSearchInput = document.getElementById("gameSearchInput");
   const gameClearBtn = document.getElementById("gameClearBtn");
@@ -396,12 +399,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectedGames = new Set();
 
+  // NUEVO: elementos (si no existen, no rompe)
   const gameSelectAllBtn = document.getElementById("gameSelectAllBtn");
   const gamesSelectedCount = document.getElementById("gamesSelectedCount");
 
   function updateSelectedCount() {
     if (!gamesSelectedCount) return;
-    gamesSelectedCount.textContent = selectedGames.size ? `${selectedGames.size} selected` : "";
+    gamesSelectedCount.textContent = selectedGames.size ? `(${selectedGames.size})` : "";
   }
 
   function syncGames() {
@@ -413,7 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return selected.platforms.size > 0 || selected.genres.size > 0;
   }
 
-  // ---------- Render helpers ----------
   function clearGamesGrid() {
     if (!gameGrid) return;
     gameGrid.innerHTML = "";
@@ -492,8 +495,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       wrap.appendChild(btn);
-
-      // Insertar después del grid
       gameGrid.parentElement?.appendChild(wrap);
     }
 
@@ -567,11 +568,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = getQueryParamsForGames(currentPage, pageSize);
     const url = `${GAMES_SEARCH_URL}?${params.toString()}`;
 
-    if (resetPage) {
-      setGamesEmptyState("Loading games...");
-    } else {
-      setLoadMoreLoading(true);
-    }
+    if (resetPage) setGamesEmptyState("Loading games...");
+    else setLoadMoreLoading(true);
 
     try {
       const res = await fetch(url, {
@@ -591,7 +589,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const items = Array.isArray(data.items) ? data.items : [];
       hasMore = !!data.has_more;
 
-      // Orden: seleccionados primero (si aparecen en la página)
       const seen = new Set();
       const selectedFirst = [];
       const rest = [];
@@ -623,9 +620,11 @@ document.addEventListener("DOMContentLoaded", () => {
       ensureLoadMoreBtn(hasMore);
       setLoadMoreLoading(false);
 
-      // avanzar página
       if (resetPage) currentPage = 2;
       else currentPage += 1;
+
+
+      syncGames();
 
     } catch (err) {
       if (err?.name === "AbortError") return;
@@ -652,27 +651,48 @@ document.addEventListener("DOMContentLoaded", () => {
     syncGames();
   });
 
-  // Select all (loaded in grid)
+
   gameSelectAllBtn?.addEventListener("click", () => {
     if (!gameGrid) return;
 
-    const buttons = gameGrid.querySelectorAll(".boss-game[data-id]");
+    const buttons = Array.from(gameGrid.querySelectorAll(".boss-game[data-id]"));
     if (!buttons.length) return;
 
-    buttons.forEach(btn => {
-      const id = btn.dataset.id;
+    const allVisibleSelected = buttons.every(b => selectedGames.has(String(b.dataset.id)));
+
+    buttons.forEach(b => {
+      const id = String(b.dataset.id || "");
       if (!id) return;
-      selectedGames.add(String(id));
-      btn.classList.add("is-selected");
+
+      if (allVisibleSelected) {
+        selectedGames.delete(id);
+        b.classList.remove("is-selected");
+      } else {
+        selectedGames.add(id);
+        b.classList.add("is-selected");
+      }
     });
 
     syncGames();
   });
 
   gameSearchInput?.addEventListener("input", () => requestGamesRefresh(true));
-  gameClearBtn?.addEventListener("click", () => {
+
+  gameClearBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
     if (gameSearchInput) gameSearchInput.value = "";
-    requestGamesRefresh(true);
+
+    selectedGames.clear();
+
+    // quitar visual de seleccionados SOLO de lo que esté pintado
+    gameGrid?.querySelectorAll(".boss-game.is-selected").forEach(b => {
+      b.classList.remove("is-selected");
+    });
+
+    syncGames();
   });
 
   // =========================
@@ -688,7 +708,6 @@ document.addEventListener("DOMContentLoaded", () => {
       categorySubmitBtn.textContent = "Save Category";
     }
 
-    // inputs básicos
     const codeInput = document.getElementById("categoryCode");
     if (codeInput) codeInput.value = "";
 
@@ -708,22 +727,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (yearFromSelect) yearFromSelect.value = "";
     if (yearToSelect) yearToSelect.value = "";
 
-    // limpiar sets
     selected.platforms.clear();
     selected.genres.clear();
     selected.decades.clear();
     selectedGames.clear();
 
-    // limpiar visual chips
     document.querySelectorAll(".boss-chip[data-group][data-value]").forEach(chip => {
       setChipVisual(chip, false);
     });
 
-    // limpiar searches
     if (platformSearchInput) platformSearchInput.value = "";
     if (gameSearchInput) gameSearchInput.value = "";
 
-    // sync hidden + refresco
     syncHidden();
     syncGames();
     applyBrandFilter(currentBrand);
@@ -734,7 +749,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setGamesEmptyState("Select platforms/genres to load games.");
   }
 
-  // Al abrir "Add Categories", SIEMPRE modo create
   openBtns.forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -789,7 +803,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const code = card.dataset.code;
 
-      // inputs básicos
       document.getElementById("categoryCode").value = code;
       document.querySelector('#categoryForm input[name="name"]').value = card.dataset.name || "";
       document.querySelector('#categoryForm textarea[name="description"]').value = card.dataset.description || "";
@@ -799,7 +812,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (poolInput) poolInput.value = card.dataset.pool || 200;
       if (sortInput) sortInput.value = card.dataset.sort || "popular";
 
-      // reset selecciones
       selected.platforms.clear();
       selected.genres.clear();
       selected.decades.clear();

@@ -69,12 +69,12 @@ def boss_games_search_api(request):
         page_size = 60
     page_size = max(12, min(page_size, 120))
 
-    # ---- base queryset----
+    #  base queryset
     qs = VideoGame.objects.all().only(
         "id", "name", "cover_url", "platforms", "genres", "first_release_date", "total_rating_count"
     )
 
-    # ---- filtros ----
+    #  filtros
     if q:
         qs = qs.filter(name__icontains=q)
 
@@ -92,7 +92,7 @@ def boss_games_search_api(request):
             q_gen |= Q(genres__icontains=g)
         qs = qs.filter(q_gen)
 
-    # years (first_release_date es string "YYYY-MM-DD" => rango ISO funciona)
+    # years (first_release_date es string "YYYY-MM-DD" => rango ISO)
     if year_from.isdigit() or year_to.isdigit():
         now_year = datetime.utcnow().year
         y1 = int(year_from) if year_from.isdigit() else 1970
@@ -112,7 +112,7 @@ def boss_games_search_api(request):
     else:
         qs = qs.order_by("-total_rating_count")
 
-    # ---- paginación ----
+    #  paginación 
     offset = (page - 1) * page_size
     slice_qs = list(qs[offset: offset + page_size + 1]) 
     has_more = len(slice_qs) > page_size

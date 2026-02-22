@@ -53,7 +53,7 @@ def go_ranking(request):
     for rk in last_rankings:
         ids.extend(list(rk.rating or []))
 
-    games_map = VideoGame.objects.in_bulk(ids)  # {id: VideoGame}
+    games_map = VideoGame.objects.in_bulk(ids)
 
     for rk in last_rankings:
         rk.top5_items = []

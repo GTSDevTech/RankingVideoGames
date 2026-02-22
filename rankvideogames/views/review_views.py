@@ -43,7 +43,7 @@ def go_statistics(request):
     pop_slice = [games_map_pop[gid] for gid in pop_ids if gid in games_map_pop]
 
 
-    # 2) TOP RATED (cache ids)
+    # TOP RATED (cache ids)
 
     ordered_ids_rated = cache.get("stats_rated_ids_v1")
     if ordered_ids_rated is None:
@@ -63,7 +63,7 @@ def go_statistics(request):
     games_map_rated = base.in_bulk(rated_ids)
     rated_slice = [games_map_rated[gid] for gid in rated_ids if gid in games_map_rated]
 
-    # 3) LAST RELEASES (paginado normal)
+    # LAST RELEASES 
 
     qs_new = base.order_by("-first_release_date", "id")
     new_page = Paginator(qs_new, PER_CAROUSEL).get_page(p3)

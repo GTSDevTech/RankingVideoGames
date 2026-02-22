@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const URL_SAVE_REVIEW = "/reviews/save/";
   const URL_LAST_COMMENTS = "/reviews/last/";
 
-  const cards = document.querySelectorAll(".game-card.js-tilt");
+  const cards = document.querySelectorAll(".game-card.js-tilt, .game-card");
   if (!cards.length) return;
 
   const sidebarLastReviewEl = document.getElementById("sidebarLastReview");
@@ -46,10 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnClearReview = document.getElementById("btnClearReview");
   const reviewMsg = document.getElementById("reviewMsg");
   const ratingStars = document.getElementById("ratingStars");
-
-  function clamp(n, min, max) {
-    return Math.max(min, Math.min(max, n));
-  }
 
   function splitPipes(s) {
     return (s || "")
@@ -106,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return parts.map((p) => p[0]?.toUpperCase() || "").join("") || "??";
   }
 
+  // ⭐ para sidebar (tu versión original: redondea a 0..5)
   function starRow(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return `<span class="stars stars--empty">—</span>`;
@@ -113,6 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const on = "★".repeat(clamped);
     const off = "★".repeat(5 - clamped);
     return `<span class="stars" aria-label="${clamped} out of 5">${on}<span class="stars-off">${off}</span></span>`;
+  }
+
+  // ⭐ para BACK de la card: usa avg de Reviews (0..5) y pinta estrellas redondeadas
+  function starRowFromAvg(avg) {
+    const n = Number(avg);
+    if (!Number.isFinite(n)) return `<span class="stars stars--empty">—</span>`;
+    const clamped = Math.max(0, Math.min(5, Math.round(n)));
+    const on = "★".repeat(clamped);
+    const off = "★".repeat(5 - clamped);
+    return `<span class="stars" aria-label="${n.toFixed(2)} out of 5">${on}<span class="stars-off">${off}</span></span>`;
   }
 
   function escapeHtml(str) {
@@ -168,6 +175,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
+  // SIDEBAR: última review
+  // =========================
   function renderSidebarLastReview(item) {
     if (!sidebarLastReviewEl) return;
 
@@ -226,6 +236,9 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebarLastReviewEl.appendChild(wrap);
   }
 
+  // =========================
+  // SIDEBAR: últimos comentarios
+  // =========================
   function renderSidebarLastComments(items) {
     if (!sidebarLastCommentsEl) return;
 
@@ -301,6 +314,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
+  // MODAL: últimos comentarios del juego
+  // =========================
   function renderLastComments(items) {
     if (!lastCommentsList) return;
 
@@ -360,6 +376,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
+  // STATS (Reviews) para MODAL
+  // =========================
   async function loadGameStats(gameId) {
     if (!gameId) return;
 
@@ -388,6 +407,57 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch {}
   }
 
+  // =========================
+  // STATS (Reviews) para BACK de cada CARD (lazy + cache)
+  // Requiere en el HTML:
+  // .game-card__starsWrap, .game-card__avgText, .game-card__countText
+  // =========================
+  async function ensureCardStats(card) {
+    if (!card) return;
+    if (card.dataset.statsLoaded === "1") return;
+
+    const gameId =
+      (card.dataset.gameId && String(card.dataset.gameId).trim()) ||
+      getField(card, "id");
+
+    if (!gameId) return;
+
+    // cache: evita spam aunque falle
+    card.dataset.statsLoaded = "1";
+
+    const starsWrap = card.querySelector(".game-card__starsWrap");
+    const avgText = card.querySelector(".game-card__avgText");
+    const countText = card.querySelector(".game-card__countText");
+
+    if (avgText) avgText.textContent = "…";
+    if (countText) countText.textContent = "…";
+    if (starsWrap) starsWrap.innerHTML = `<span class="stars stars--empty">—</span>`;
+
+    try {
+      const res = await fetch(`${URL_GAME_STATS}?game=${encodeURIComponent(gameId)}`, {
+        headers: { Accept: "application/json" },
+        credentials: "same-origin",
+      });
+
+      if (!res.ok) throw new Error("stats");
+
+      const data = await res.json().catch(() => ({}));
+      const avg = data?.avg;
+      const count = data?.count;
+
+      if (starsWrap) starsWrap.innerHTML = starRowFromAvg(avg);
+      if (avgText) avgText.textContent = (avg === null || typeof avg === "undefined") ? "—" : Number(avg).toFixed(2);
+      if (countText) countText.textContent = (typeof count === "undefined") ? "—" : String(count);
+    } catch {
+      if (starsWrap) starsWrap.innerHTML = `<span class="stars stars--empty">—</span>`;
+      if (avgText) avgText.textContent = "—";
+      if (countText) countText.textContent = "—";
+    }
+  }
+
+  // =========================
+  // MI REVIEW
+  // =========================
   async function loadMyReview(gameId) {
     if (!gameId) return;
 
@@ -450,10 +520,20 @@ document.addEventListener("DOMContentLoaded", () => {
       showReviewMsg(data.updated ? "Review updated." : "Review saved.", true);
       if (btnSaveReview) btnSaveReview.textContent = "Update review";
 
+      // ✅ actualizar modal
       loadGameStats(gameId);
       loadLastComments(gameId);
+
+      // ✅ actualizar sidebars
       loadSidebarLastReview();
       loadSidebarLastComments();
+
+      // ✅ actualizar BACK de la card que está activa
+      if (activeCard) {
+        // forzamos refresco: quitamos cache y recargamos
+        activeCard.dataset.statsLoaded = "0";
+        ensureCardStats(activeCard);
+      }
     } catch {
       showReviewMsg("Network error saving review.", false);
     } finally {
@@ -461,11 +541,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
+  // ABRIR / CERRAR MODAL
+  // =========================
   function openModalFromCard(card) {
     activeCard = card;
+
+    // ✅ deja la card girada (CSS lo hace con .is-modal-open)
     activeCard.classList.add("is-modal-open");
-    activeCard.classList.remove("is-tilting");
-    activeCard.style.transform = "";
+
+    // ✅ carga stats para el back (por si aún no están)
+    ensureCardStats(activeCard);
 
     const name = getField(card, "name") || "Game";
     const cover = getField(card, "cover");
@@ -515,6 +601,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
 
+    // fuerza reflow
     panel.getBoundingClientRect();
     panel.style.setProperty("--clip-r", `140vmax`);
 
@@ -548,47 +635,13 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.addEventListener("transitionend", onEnd);
   }
 
-  function initTilt() {
+  // =========================
+  // EVENTOS
+  // =========================
+  function initCardBackStatsHover() {
+    // ✅ lazy load stats solo al pasar por encima
     cards.forEach((card) => {
-      const container = card;
-
-      const coverImg = card.querySelector(".js-tilt-cover img");
-      const title = card.querySelector(".js-tilt-title");
-      const meta = card.querySelector(".js-tilt-meta");
-      const actions = card.querySelector(".js-tilt-actions");
-
-      const popEls = [coverImg, title, meta, actions].filter(Boolean);
-
-      function onMove(e) {
-        const rect = container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const midX = rect.width / 2;
-        const midY = rect.height / 2;
-
-        const rotateY = clamp((midX - x) / 20, -12, 12);
-        const rotateX = clamp((y - midY) / 20, -12, 12);
-
-        card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
-      }
-
-      function onEnter() {
-        card.classList.add("is-tilting");
-        card.style.transition = "none";
-        popEls.forEach((el) => (el.style.transition = "transform .25s ease"));
-      }
-
-      function onLeave() {
-        card.classList.remove("is-tilting");
-        card.style.transition = "transform .35s ease";
-        card.style.transform = "rotateY(0deg) rotateX(0deg)";
-        popEls.forEach((el) => (el.style.transform = "translateZ(0)"));
-      }
-
-      container.addEventListener("mousemove", onMove);
-      container.addEventListener("mouseenter", onEnter);
-      container.addEventListener("mouseleave", onLeave);
+      card.addEventListener("mouseenter", () => ensureCardStats(card), { passive: true });
     });
   }
 
@@ -605,18 +658,35 @@ document.addEventListener("DOMContentLoaded", () => {
       downY = e.clientY;
     });
 
-    document.addEventListener("pointerup", (e) => {
-      if (!pointerDownCard) return;
+document.addEventListener("pointerup", (e) => {
+  if (!pointerDownCard) return;
 
-      const dx = Math.abs(e.clientX - downX);
-      const dy = Math.abs(e.clientY - downY);
+  const dx = Math.abs(e.clientX - downX);
+  const dy = Math.abs(e.clientY - downY);
 
-      const card = pointerDownCard;
-      pointerDownCard = null;
+  const card = pointerDownCard;
+  pointerDownCard = null;
 
-      if (dx > 8 || dy > 8) return;
-      openModalFromCard(card);
-    });
+  if (dx > 8 || dy > 8) return;
+
+  const r = card.getBoundingClientRect();
+  const px = (downX - r.left) / r.width;   // 0..1
+  const py = (downY - r.top) / r.height;  // 0..1
+
+  const max = 8; // grados
+  const ry = (px - 0.5) * (max * 2);       
+  const rx = -(py - 0.5) * (max * 2);      
+
+  card.style.setProperty("--open-rx", `${rx.toFixed(2)}deg`);
+  card.style.setProperty("--open-ry", `${ry.toFixed(2)}deg`);
+  card.classList.add("is-opening");
+
+  setTimeout(() => {
+  card.classList.remove("is-opening");
+  openModalFromCard(card);
+}, 220);
+
+});
 
     modal.addEventListener("click", (e) => {
       if (e.target.closest("[data-close]")) closeModal();
@@ -639,7 +709,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  initTilt();
+  // ✅ init (sin tilt, sin basura)
+  initCardBackStatsHover();
   initModalEvents();
   initReviewEvents();
   loadSidebarLastReview();

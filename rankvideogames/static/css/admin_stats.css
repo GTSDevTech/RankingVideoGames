@@ -6,9 +6,7 @@
 
 }
 
-/* =========================
-   CARD
-   ========================= */
+/*CARD */
 .stats-card {
   display: flex;
   gap: 14px;
@@ -29,9 +27,7 @@
   box-shadow: 0 18px 40px rgba(0,0,0,.45);
 }
 
-/* =========================
-   COVER
-   ========================= */
+/* COVER */
 .stats-card__cover {
   width: 54px;
   height: 74px;
@@ -41,9 +37,7 @@
   box-shadow: 0 6px 14px rgba(0,0,0,.45);
 }
 
-/* =========================
-   BODY
-   ========================= */
+/*  BODY */
 .stats-card__body {
   display: flex;
   flex-direction: column;
@@ -58,9 +52,7 @@
   line-height: 1.2;
 }
 
-/* =========================
-   META
-   ========================= */
+/* META */
 .stats-meta {
   display: flex;
   flex-wrap: wrap;
@@ -82,9 +74,7 @@
   color: #0b1020;
 }
 
-/* =========================
-   POSITIONS
-   ========================= */
+/* POSITIONS */
 .stats-positions {
   display: flex;
   flex-wrap: wrap;
@@ -101,9 +91,7 @@
   color: #fff;
 }
 
-/* =========================
-   SELECT
-   ========================= */
+/* SELECT */
 .stats-select {
   background: rgba(15, 12, 41, 0.85);
   color: #fff;
@@ -118,9 +106,7 @@
   border-color: rgba(46,226,255,.9);
 }
 
-/* =========================
-   EMPTY
-   ========================= */
+/* EMPTY */
 .stats-empty {
   color: rgba(229,231,235,.65);
   padding: 24px;

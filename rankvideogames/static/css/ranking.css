@@ -1,3 +1,14 @@
+:root{
+  --rk-blue: rgba(2, 54, 129, 0.55);
+  --rk-blue2: rgba(2, 43, 105, 0.55);
+  --rk-cyan: rgba(46, 226, 255, 0.16);
+  --rk-purple: rgba(168, 85, 247, 0.16);
+  --rk-pink: rgba(255, 46, 214, 0.14);
+  --rk-border: rgba(56, 189, 248, 0.22);
+  --rk-text: #e5e7eb;
+  --rk-muted: rgba(229,231,235,0.70);
+}
+
 
 body.bg-ranking{
   box-sizing: border-box;
@@ -32,14 +43,42 @@ body.bg-ranking{
 }
 
 .subcontainer-ranking{
-
+  width: 80%;
+  margin: 3rem 3rem 3rem 0;
   display: flex;
-  flex-direction: row;
+  gap: 18px;                 
   align-items: flex-start;
   justify-content: center;
-  
+  justify-self: center;
 }
 
+
+.subcontainer-ranking > .boss-wrapper{
+  flex: 1 1 0;
+  min-width: 0;              
+}
+
+
+.subcontainer-ranking > .ranking-panel{
+  flex: 0 0 360px;
+  max-width: 360px;
+  min-width: 320px;
+  margin-top: 1rem;   
+}
+
+
+@media (max-width: 992px){
+  .subcontainer-ranking{
+    width: 100%;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .subcontainer-ranking > .ranking-panel{
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+  }
+}
 .main-row-rk-panel{
   width: 100% !important;
   max-height: 80vh !important;
@@ -144,8 +183,9 @@ body.bg-ranking{
 }
 
 .boss-wrapper{
-  width: min(1200px, 100%);
-  margin: 0 auto;
+ width: 100%;
+  margin: 0;
+  min-width: 0;
 }
 
 .boss-cat-wrapper{
@@ -209,7 +249,7 @@ body.bg-ranking{
 .boss-cat-card > *{ position:relative; z-index:1; }
 
 
-/* Top row */
+
 .boss-cat-card__top{
   display:flex;
   align-items:center;
@@ -272,12 +312,14 @@ body.bg-ranking{
   background: rgba(15, 12, 41, 0.55);
   box-shadow: 0 12px 30px rgba(0,0,0,0.30);
   padding: 18px;
+  
 }
 
 .boss-section__head{
   display:flex;
   justify-content: space-between;
-  align-items: end;
+  justify-self: center;
+  align-items: center;
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -303,7 +345,7 @@ body.bg-ranking{
   box-shadow: 0 0 0 2px rgba(46,226,255,.16), 0 18px 38px rgba(0,0,0,.35);
 }
 
-/* badge arriba derecha */
+
 .boss-cat-badge{
   position:absolute;
   top:10px;
@@ -379,7 +421,7 @@ body.bg-ranking{
 }
 
 
-/* Panels */
+
 .rk-panel{
   border-radius: 18px;
   overflow: hidden;
@@ -435,7 +477,7 @@ body.bg-ranking{
 }
 .rk-btn-reset:hover{ filter: brightness(1.05); }
 
-/* Stats */
+
 .rk-stats{
   display:flex;
   justify-content: space-between;
@@ -447,7 +489,7 @@ body.bg-ranking{
   color: var(--rk-text);
 }
 
-/* Small counter on right header */
+
 .rk-mini{
   display:flex;
   flex-direction: column;
@@ -460,7 +502,7 @@ body.bg-ranking{
   font-size: 1.1rem;
 }
 
-/* Search */
+
 .rk-search{
   display:flex;
   align-items:center;
@@ -490,7 +532,7 @@ body.bg-ranking{
 }
 .rk-search__clear:hover{ filter: brightness(1.05); }
 
-/* Pool wrapper allows scrolling */
+
 .rk-pool-wrap{
   border-radius: 18px;
   border: 1px solid rgba(56,189,248,0.16);
@@ -501,7 +543,7 @@ body.bg-ranking{
   overflow: auto;
 }
 
-/* Pool grid like movies */
+
 .rk-pool{
   display:grid;
   grid-template-columns: repeat(2, minmax(0,1fr));
@@ -511,9 +553,8 @@ body.bg-ranking{
   .rk-pool{ grid-template-columns: 1fr; }
 }
 
-/* Movie-style card (same size as slot) */
 .rk-item{
-  height: 120px;                 /* IMPORTANT: same as slot */
+  height: 120px;                 
   border-radius: 16px;
   border: 1px solid rgba(56,189,248,0.20);
   background: rgba(255,255,255,0.05);
@@ -571,14 +612,13 @@ body.bg-ranking{
   text-overflow: ellipsis;
 }
 
-/* Used in pool */
 .rk-used{
   opacity: 0.35;
   filter: grayscale(.3);
   pointer-events: none;
 }
 
-/* Center hero Top5 */
+
 .rk-hero{
   border-radius: 22px;
   overflow: hidden;
@@ -619,14 +659,14 @@ body.bg-ranking{
   padding: 16px;
 }
 
-/* Slots */
+
 .rk-top5{
   display:flex;
   flex-direction: column;
   gap: 12px;
 }
 .rk-slot{
-  height: 120px;                 /* SAME as rk-item */
+  height: 120px;                 
   border-radius: 18px;
   border: 2px dashed rgba(46,226,255,0.35);
   background: rgba(255,255,255,0.04);
@@ -642,7 +682,7 @@ body.bg-ranking{
   transform: scale(1.01);
   background: rgba(190,227,240,0.10);
 }
-/* Icon inside rank badge */
+
 .rk-rank{
   width: 56px;
   height: 56px;
@@ -655,7 +695,7 @@ body.bg-ranking{
   position: relative;
 }
 
-/* Icon styling */
+
 .rk-rank i{
   font-size: 1.55rem;
   line-height: 1;
@@ -663,7 +703,7 @@ body.bg-ranking{
   filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
 }
 
-/* Optional: different “medal” colors per position (sin tocar tu paleta general) */
+
 .rk-rank--1{
   background: linear-gradient(135deg, #ffd54a, #ff9f1c);
   box-shadow: 0 0 16px rgba(255, 200, 60, 0.30);
@@ -704,7 +744,7 @@ body.bg-ranking{
   background: rgba(15,12,41,0.55);
 }
 
-/* Left selected list */
+
 .rk-selected{
   display:flex;
   flex-direction: column;

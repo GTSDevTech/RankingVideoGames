@@ -87,7 +87,7 @@ def go_admin_stats(request):
 def go_admin_global_ranking(request):
     limit = int(request.GET.get("limit", 50))
 
-    qs_rankings = Ranking.objects.all()  # GLOBAL
+    qs_rankings = Ranking.objects.all()  
     stats = build_global_ranking(qs_rankings)
 
     game_ids = list(stats.keys())

@@ -13,7 +13,7 @@ def go_home(request):
         )
     )
 
-    # --- SEARCH ---
+    # SEARCH 
     q = (request.GET.get("q") or "").strip()
     search_by = (request.GET.get("search_by") or "all").strip()
 
@@ -33,7 +33,7 @@ def go_home(request):
                 Q(publishers__icontains=q)
             )
 
-    # --- FILTERS (collapse) ---
+    # FILTERS ()
     category = (request.GET.get("category") or "").strip()
     platform = (request.GET.get("platform") or "").strip()
     status = (request.GET.get("status") or "").strip()

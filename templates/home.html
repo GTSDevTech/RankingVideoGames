@@ -1,12 +1,15 @@
 
 {% extends 'base.html' %}
-
+{% load static %}
 {% load text_filters %}
 {% block nav %}
   {% include 'includes/nav.html' %}
 {% endblock %}
 
 {% block body_class %}bg-home{% endblock %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
 
 {% block body %}
 <main class="home-content">
@@ -28,10 +31,11 @@
       <section class="col-12 col-lg-9">
         <section class="games-grid">
           {% for g in page_obj %}
-          <article class="game-card js-tilt js-game-open">
-            <div class="game-card__inner">
-              <div class="game-card__front">
-                <div class="game-cover js-tilt-cover">
+            <article class="game-card js-tilt js-game-open" data-game-id="{{ g.id }}">
+
+              <!-- FRONT -->
+              <div class="side front">
+                <div class="game-cover">
                   {% if g.cover_url %}
                     <img src="{{ g.cover_url }}" alt="{{ g.name }}">
                   {% else %}
@@ -39,38 +43,82 @@
                   {% endif %}
                 </div>
 
-                <div class="game-body js-tilt-body">
-                  <h3 class="game-title js-tilt-title" title="{{ g.name }}">{{ g.name }}</h3>
-
-                  <div class="game-meta js-tilt-meta">
-                    {% if g.platforms %}
-                      {% for p in g.platforms|split:"|" %}
-                        <span class="meta-pill">{{ p }}</span>
-                      {% endfor %}
-                    {% else %}
-                      <span class="meta-pill">Unknown platform</span>
-                    {% endif %}
-                  </div>
+                <div class="game-front__body">
+                  <h3 class="game-title" title="{{ g.name }}">{{ g.name }}</h3>
                 </div>
               </div>
 
-              <div class="game-card__back" aria-hidden="true"></div>
-      
-            <section class="game-hidden" hidden>
-              <span data-field="id">{{ g.id }}</span>
-              <span data-field="slug">{{ g.slug|default:'' }}</span>
-              <span data-field="release">{{ g.first_release_date|default:"" }}</span>
-              <span data-field="developers">{{ g.developers|default:'' }}</span>
-              <span data-field="publishers">{{ g.publishers|default:'' }}</span>
-              <span data-field="rating">{{ g.total_rating|stringformat:"s"|default:"" }}</span>
-              <span data-field="rating_count">{{ g.total_rating_count|stringformat:"s"|default:"" }}</span>
-              <span data-field="cover">{{ g.cover_url|default:'' }}</span>
-              <span data-field="platforms">{{ g.platforms|default:'' }}</span>
-              <span data-field="genres">{{ g.genres|default:'' }}</span>
-              <span data-field="name">{{ g.name|default:'' }}</span>
-            </section>
-          </article>
-          {% endfor %}
+              <!-- BACK -->
+              <div class="side back">
+                <div class="game-back__wrap">
+
+                  <header class="game-back__top">
+                    <div class="game-back__rating">
+
+                      <div class="game-back__label">Rating</div>
+
+                      <div class="game-card__starsWrap">
+                        <span class="stars stars--empty">—</span>
+                      </div>
+
+        
+                      <div class="game-card__avgText game-back__value">—</div>
+                    </div>
+
+                    <div class="game-back__votes">
+                      <div class="game-back__label">Votes</div>
+
+                      <div class="game-card__countText game-back__value">—</div>
+                    </div>
+                  </header>
+
+                  <section class="game-back__section">
+                    <div class="game-back__sectionTitle">Platforms</div>
+                    <div class="game-back__pills">
+                      {% if g.platforms %}
+                        {% for p in g.platforms|split:"|" %}
+                          <span class="pill">{{ p }}</span>
+                        {% endfor %}
+                      {% else %}
+                        <span class="pill pill--muted">Unknown</span>
+                      {% endif %}
+                    </div>
+                  </section>
+
+                  <section class="game-back__section">
+                    <div class="game-back__sectionTitle">Genres</div>
+                    <div class="game-back__pills">
+                      {% if g.genres %}
+                        {% for ge in g.genres|split:"|" %}
+                          <span class="pill pill--genre">{{ ge }}</span>
+                        {% endfor %}
+                      {% else %}
+                        <span class="pill pill--muted pill--genre">Unknown</span>
+                      {% endif %}
+                    </div>
+                  </section>
+
+                </div>
+              </div>
+
+              <!-- Hidden payloads -->
+              <section class="game-hidden" hidden>
+                <span data-field="id">{{ g.id }}</span>
+                <span data-field="slug">{{ g.slug|default:'' }}</span>
+                <span data-field="release">{{ g.first_release_date|default:"" }}</span>
+                <span data-field="developers">{{ g.developers|default:'' }}</span>
+                <span data-field="publishers">{{ g.publishers|default:'' }}</span>
+                <span data-field="rating">{{ g.total_rating|stringformat:"s"|default:"" }}</span>
+                <span data-field="rating_count">{{ g.total_rating_count|stringformat:"s"|default:"" }}</span>
+                <span data-field="cover">{{ g.cover_url|default:'' }}</span>
+                <span data-field="platforms">{{ g.platforms|default:'' }}</span>
+                <span data-field="genres">{{ g.genres|default:'' }}</span>
+                <span data-field="name">{{ g.name|default:'' }}</span>
+              </section>
+
+            </article>
+
+    {% endfor %}
         </section>
 
 
@@ -152,20 +200,19 @@
           </div>
           <i class="bx bxs-message-rounded-dots"></i>
         </div>
+          <div class="home-panel__body">
+            <div class="sidebar-comments-scroll">
+              <div id="sidebarLastComments"></div>
+            </div>
 
-        <div class="home-panel__body">
+            <div id="sidebarLastCommentsEmpty" class="comment-snippet" style="display:none;">
+              No hay comentarios todavía.
+            </div>
 
-          <div id="sidebarLastComments"></div>
-
-          <div id="sidebarLastCommentsEmpty" class="comment-snippet" style="display:none;">
-            No hay comentarios todavía.
+            <div id="sidebarLastCommentsLoading" class="comment-snippet">
+              Cargando…
+            </div>
           </div>
-
-          <div id="sidebarLastCommentsLoading" class="comment-snippet">
-            Cargando…
-          </div>
-
-        </div>
       </div>
 
     </div>
@@ -266,3 +313,4 @@
 </div>
 <script src="/static/js/home-card-game.js"></script>
 {% endblock %}
+      

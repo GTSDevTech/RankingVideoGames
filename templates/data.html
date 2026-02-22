@@ -6,6 +6,7 @@
 {% endblock %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/data.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block title %}Boss Panel{% endblock %}
@@ -177,6 +178,7 @@
 
   </div>
 </main>
+
 
 
 <!-- MODAL Categories -->
@@ -378,7 +380,9 @@
           <div class="boss-sidepanel mt-3">
             <div class="boss-sidepanel__head">
               <div>
-                <div class="boss-sidepanel__title">Games</div>
+                <div class="boss-sidepanel__title">
+                  Games <span id="gamesSelectedCount" class="boss-games-count"></span>
+                </div>
                 <div class="boss-sidepanel__sub">Search & select</div>
               </div>
               <i class="bx bxs-search"></i>
@@ -388,6 +392,12 @@
               <i class="bx bx-search"></i>
               <input id="gameSearchInput" class="boss-sidepanel__input" type="text" placeholder="Search game…">
               <button id="gameClearBtn" class="boss-sidepanel__clear" type="button">Clear</button>
+            </div>
+
+            <div class="boss-games-actions">
+              <button id="gameSelectAllBtn" class="boss-btn boss-btn--ghost" type="button">
+                Select all
+              </button>
             </div>
 
             <div class="boss-preview">
@@ -404,9 +414,7 @@
           </div>
 
         </aside>
-      </div>
-
-      <!-- FOOTER centrado -->
+      </div> 
       <div class="boss-modal__footer boss-form__actions">
         <button type="button" class="boss-btn boss-btn--ghost" data-close>Cancel</button>
         <button type="submit"
@@ -415,6 +423,7 @@
           Save Category
         </button>
       </div>
+
     </form>
   </div>
 </div>
